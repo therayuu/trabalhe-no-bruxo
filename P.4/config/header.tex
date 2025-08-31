@@ -1,0 +1,53 @@
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+
+%% Plano de fundo
+\setbeamertemplate{background}{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[opacity=0.25] at (current page.center) {
+      \includegraphics[width=2\paperwidth]{../img/back.jpg}
+    };
+  \end{tikzpicture}
+}
+
+%% Cores
+\definecolor{purple}{RGB}{68, 0, 112}
+\definecolor{gray}{RGB}{40, 10, 40}
+\definecolor{black}{RGB}{0, 0, 0}
+
+\setbeamercolor{title}{fg=purple}
+\setbeamercolor{section title}{fg=purple}
+\setbeamercolor{subsection title}{fg=purple}
+\setbeamercolor{frametitle}{fg=purple}
+
+\setbeamercolor{author}{fg=gray}
+\setbeamercolor{date}{fg=gray}
+
+\setbeamercolor{item}{fg=gray}
+\setbeamercolor{item projected}{bg=gray}
+
+%% Tamanho da Fonte
+\renewcommand{\normalsize}{\fontsize{12}{14}\selectfont} 
+\renewcommand{\large}{\fontsize{14}{16}\selectfont}
+\renewcommand{\Large}{\fontsize{16}{18}\selectfont}
+\renewcommand{\LARGE}{\fontsize{18}{20}\selectfont}
+
+%% Outras coisas
+\setbeamertemplate{frametitle}[default][center]
+\setbeamertemplate{itemize items}[circle] % or [square], [triangle], [rectangle], etc
+
+%% Imagem na página de título
+%\setbeamertemplate{title page}{
+%  \begin{centering}
+%    \vfill
+%    {\usebeamerfont{title}\inserttitle\par}
+%    \vskip0.5em
+%    {\usebeamerfont{subtitle}\insertsubtitle\par}
+%    \vskip1em
+%    {\usebeamerfont{author}\insertauthor\par}
+%    \vskip1em
+%    %\includegraphics[width=0.5\textwidth]{img/tela_inivial.jpg}
+%    \vfill
+%  \end{centering}
+%}

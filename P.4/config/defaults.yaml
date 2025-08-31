@@ -1,0 +1,5 @@
+from: markdown-implicit_figures+lists_without_preceding_blankline
+filters:
+  - citeproc
+variables:
+  lang: pt-BR
