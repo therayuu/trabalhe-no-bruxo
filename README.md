@@ -10,5 +10,5 @@
 4. Qual parte do projeto é especial?
     - A mecânica de fusão para criar novos elementos.
 
-5. Poste telas de "screenshots" do projeto:
+5. Capa do jogo:
     - ![](img/menu.jpg)
