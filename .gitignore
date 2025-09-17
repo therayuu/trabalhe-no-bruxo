@@ -1,1 +1,7 @@
 *.pdf
+
+*.exe
+*.out
+*.so
+*.o
+*.dll
