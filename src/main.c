@@ -5,7 +5,7 @@
 #include "AUX.h"
 
 
-#define ASSETS_DIR "img/"
+#define ASSETS "../assets/"
 
 #define W_WIDTH  1080
 #define W_HEIGHT 720
@@ -24,7 +24,7 @@ int main() {
                          W_WIDTH, W_HEIGHT, SDL_WINDOW_SHOWN
                       );
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, 0);
-    SDL_Texture* img = IMG_LoadTexture(ren, ASSETS_DIR"tela_inicial.png");
+    SDL_Texture* img = IMG_LoadTexture(ren, ASSETS"fundo_menu.png");
     assert(img != NULL);
 
     /* EXECUÇÃO */
