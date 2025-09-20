@@ -21,10 +21,10 @@ Dependendo do resultado da sua poção, coisas diferentes podem acontecer.
 
 # Diálogo
 
-![Diálogo](../img/loja.png "Diálogo com um personagem.")
+![Diálogo](img/loja.png "Diálogo com um personagem.")
 
 
 # Fusão de elementos
 
-![Fusão](../img/mesa.png "A mecânica de fusão para criar novos elementos.")
+![Fusão](img/mesa.png "A mecânica de fusão para criar novos elementos.")
 

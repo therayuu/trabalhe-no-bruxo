@@ -11,6 +11,6 @@
     - A mecânica de fusão para criar novos elementos.
 
 5. Poste telas de "screenshots" do projeto:
-    - ![](../img/menu.jpg)
-    - ![](../img/loja.png)
-    - ![](../img/mesa.png)
+    - ![](img/menu.jpg)
+    - ![](img/loja.png)
+    - ![](img/mesa.png)

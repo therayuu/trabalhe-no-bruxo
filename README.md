@@ -11,4 +11,4 @@
     - A mecânica de fusão para criar novos elementos.
 
 5. Capa do jogo:
-    - ![](img/menu.jpg)
+    - ![](docs/img/menu.jpg)
