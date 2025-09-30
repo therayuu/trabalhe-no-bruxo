@@ -23,6 +23,11 @@ int32_t AUX_dt(uint32_t antes, uint32_t* depois) {
     return delta;
 }
 
+typedef enum {
+    AUX_TIMEOUTEVENT = 0,
+    AUX_FIRSTUSEREVENT,
+} AUX_EventType;
+
 bool AUX_WaitEventTimeoutCount(SDL_Event* evt, uint32_t* ms) {
     static uint32_t antes;
     if (antes == 0) antes = SDL_GetTicks();
@@ -40,6 +45,19 @@ bool AUX_WaitEventTimeout(SDL_Event* evt, uint32_t* ms, uint32_t timeout) {
     if (!evento) *ms = timeout;
 
     return evento;
+}
+
+void AUX_FillTimeout(SDL_Event* evt) {
+     evt->user = (SDL_UserEvent) {
+         .type = SDL_USEREVENT,
+         .code = AUX_TIMEOUTEVENT,
+         .timestamp = SDL_GetTicks(),
+     };
+}
+
+void AUX_NextEvent(SDL_Event* evt, uint32_t* falta, uint32_t timeout) {
+    if (AUX_WaitEventTimeout(evt, falta, timeout));
+    else AUX_FillTimeout(evt);
 }
 
 
