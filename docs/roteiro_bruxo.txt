@@ -1,1 +1,163 @@
-Começo:
+Introdução:
+
+Medea (Narração):
+    Desde o princípio, a bruxaria esteve presente no nosso mundo. 
+    Entre os povos antigos, a magia funcionava como uma ferramenta muito poderosa. 
+    Capaz de vencer guerras, curar, ferir, fazer e desfazer todo tipo de coisa.
+    Porém, nos dias de hoje, a visão das pessoas sobre a magia mudou radicalmente.
+    A história da bruxaria foi distorcida e apagada por homens covardes.
+    Eles temiam o poder da magia ancestral e perseguiam aqueles que tinham conhecimento e 
+    domínio sobre ela.
+    Existem dois tipos de opinião sobre bruxas atualmente: ou elas não existem, ou elas são malignas.
+    Mas eu sou a prova viva de que nenhum dos dois casos está certo.
+    Meu nome é Medéia e eu sou uma bruxa mirim. Bem, ainda não. Mas eu estou no caminho certo!
+    Eu venho de uma linhagem muito antiga de bruxas e bruxos que criaram poções, feitiços 
+    e que descobriram verdades ocultas sobre o poder da magia.
+    Mas eu nunca pude praticar a magia como meus antecessores porque bruxas não são bem-vindas onde eu nasci.
+    Até o momento que eu conheci a Teresa, minha mentora.
+    Depois de ter me encontrado sozinha e desamparada, ela me acolheu e eu passei a morar junto a ela
+    na sua loja de poções.
+    Mesmo sendo uma mulher muito carinhosa e sábia, nada é de graça nessa vida, não é mesmo?
+    Em troca de abrigo e uma barriga cheia todos os dias, eu concordei em trabalhar em sua loja 
+    fazendo poções.
+    Hoje é meu primeiro dia trabalhando lá.
+    Me sinto nervosa, mas ao mesmo tempo muito animada.
+    Essa é minha chance de colocar em prática tudo que eu sei e mostrar o meu melhor!
+    Eu quero que meus pais vejam os meus feitos e se orgulhem de mim, onde quer que eles estejam.
+Teresa:
+        Anda logo, diz que que cê vai querer.
+Medeia:
+        Teresa?
+Teresa:     
+        Venha entrando, minha pequena. Vou te mostrar como fazemos as coisas por aqui.
+
+Tutorial:
+
+Teresa:
+    Essa é a nossa bancada de trabalho. Aqui estão os ingredientes e ferramentas necessários para 
+    produzir poções e feitiços.
+    Nós utilizamos os elementos primários para criar uma poção.
+    Para criar uma poção corretamente, você deve prestar atenção às demandas do seu cliente e 
+    utilizar os elementos corretos com base na história.
+    Agora vamos falar sobre os elementos utilizados nas poções.
+    O elemento do Fogo representa a paixão. 
+    Tudo o que envolve fervor, cólera e força pode ser transformado por ela.
+    >A carta do Fogo é adicionada a mesa.
+    O elemento do Água representa o emocional. 
+    Tudo o que envolve sentimentos, as artes e criatividade pode ser moldado por ela.
+    >A carta da Água é adicionada a mesa.
+    O elemento da Terra representa o material. 
+    Tudo o que envolve o mundo físico e o que é paupável pode ser criado apartir dela.
+    >A carta da Terra é adicionada a mesa.
+    O elemento do Ar representa o mental.
+    Tudo o que envolve sabedoria, reflexão e comunicação pode ser influenciado por ela.
+    >A carta do Ar é adicionada a mesa.
+
+    Agora vamos praticar o que você aprendeu.
+    Me dê uma poção que me ajude a acalmar uma pessoa com ódio.
+    >Medeia junta os elementos de Ar e Fogo e cria o elemento do Som.
+
+    Muito bem, pequena! Para seu primeiro dia você está se saindo muito bem.
+
+Medeia:
+
+    Ah, isso foi muito fácil!
+
+Teresa:
+    Já que você achou fácil quer dizer que você já pode atender os clientes sozinha, certo?
+
+Medeia:
+    Vish, dei com os dentes na língua...
+
+Teresa:
+    Vá já para a frente do balcão e comece seu dia de trabalho. Boa sorte!
+
+ Caso 1:
+ 
+    Medeia:
+    (Nossa! A Teresa parece ter ficado muito zangada...)
+    Pedro:
+    Aí, cê vai me atender ou vai ficar aí pensando na morte da bezerra?
+    Medeia: 
+    Ah desculpa sen-- Pedro?!
+    Pedro:
+    Eu te conheço, menina?
+    Medeia:
+    A gente estudou junto, seu abusado!
+    Pedro:
+    Ah... Pera, Medeia?!
+    Medeia:
+    (Até que enfim ele percebeu... Mas se bem me lembro--)
+    O que você tá fazendo aqui? Achei que não acreditasse em magia.
+    Pedro:
+    Eer... Claro que não! Magia é uma idiotice. Mas... Eu não tenho mais a quem recorrer.
+    Medeia:
+    (O Pedro parece diferente desde a ultima vez que vi ele.) E aí você veio atrás da "idiota" aqui, né?
+    Pedro:
+    ...
+    Medeia:
+    Qual o problema?
+    Pedro:
+    É um garoto.
+    Medeia:
+    Pera aí, a gente não vende veneno aqui não!
+    Pedro:
+    Quê?! Eu to falando de um encontro, sua tonta!
+    Medeia:
+    AH! Nesse caso pode continuar, hehe...
+    Pedro:
+    Lembra do Gabriel da escola? Eu queria pregar uma peça nele, então criei um perfil falso
+    no Kinder pra zoar com ele.
+    Medeia:
+    E por que você faria uma coisa tão cruel assim?
+    Pedro:
+    Porque o amor é uma idiotice! Só os mais bobos caem nesse tipo de coisa.
+    Medeia:
+    E você tá aqui porque...?
+    Pedro:
+    ...Eu me apaixonei.
+    Medeia:
+    (Me parece que você devia parar de chamar essas coisas de idiotice.)
+    E o que a gente tem a ver com isso?
+    Pedro:
+    Eu... falei pra ele que era uma menina. 
+    (Ele mostra a descrição de seu, está escrito: "totalmente uma garota, pode confiar rsrs") 
+    Eu preciso de alguma coisa que me faça parecer uma menina pra ele.
+    Medeia:
+    (E lá está. Agora sim é o Pedro que eu conheço.)
+    Você já pensou em só pagar por uma cirurgia que nem os outros?
+    Pedro:
+    Tá maluca?? Não nasci herdeiro, não!
+    Medeia: 
+    Ok. Me descreve exatamente as coisas que você precisa que mudem.
+    Pedro:
+    Tá. Pra começar, eu acho que eu preciso de uma voz nova. Alguma coisa mais melódica.
+    Além disso, alguma coisa que molde meu corpo mais perto do que imagino. E quem sabe uma dose de coragem?
+    Medeia:
+    Mais alguma coisa?
+    Pedro: Você tem uma saia?
+    Medeia:
+    Se vira! Isso aqui não é um brecho, não!
+    Pedro:
+    Não é?
+    Medeia:
+    Espera, na verdade é sim! Vai lá na frente que a gente tá vendendo. 
+    Mas vai te custar separado!
+    (Pedro sai, deixando Medeia para pensar na receita.)
+    Medeia:
+    Ok, primeiramente ele queria uma coisa que deixasse a voz dele mais melódica.
+    O que podemos juntar para conseguir isso?
+    >Medeia indica o elemento do Som.
+    Medeia:
+    (Perfeito! Aquela coisa que a Teresa me fez criar no final das contas realmente serviu para algo.)
+    (Agora, o que pode moldar o corpo dele à sua imaginação? Eu não acho que tenho algo para isso...)
+    >Medeia junta terra com Ar. 
+    (Ótimo! Isso aqui vai dar textura para a poção. Agora, coragem? Como alguém sequer faz algo assim?)
+    >Medeia mistura Fogo com Água.
+    (Consegui! Eu decifrei minha primeira receita!!
+    Agora é só juntar os elementos...)
+    >Medeia junta os elementos conquistados.
+    (Pronto. Agora é torcer pra dar certo...)     
+
+final bom / 
+final ruim
