@@ -160,4 +160,91 @@ Teresa:
     (Pronto. Agora é torcer pra dar certo...)     
 
 final bom / 
+
+
 final ruim
+
+>Medeia volta ao balcão.
+    Pedro:
+    E aí? A parada tá pronta?
+    Medeia:
+    Por que você tá falando como se eu tivesse te vendendo drogas?
+    Pedro:
+    Ah, sei lá. A situação é tão esquisita quanto. Eu tô numa loja com uma sala escondida e eu não faço ideia do que você colocou aí.
+    Medeia:
+    E você veio aqui por conta própria.
+    >Medeia entrega o frasco para Pedro.
+    Pedro:
+    Bom, isso não importa. O que que eu faço com essa coisa?
+    Medeia:
+    Meia hora antes do seu encontro você toma a poção e espera fazer efeito.
+    Mas não abusa muito não porque ela só faz efeito por um tempo limitado.
+    Pedro:
+    Certo. Você tem certeza de que isso vai funcionar?
+    Medeia:
+    É claro que vai!
+    (Estou com um mal pressentimento sobre isso...)
+    Pedro:
+    Tô confiando em você, ein!
+    Vou indo embora, não quero me atrasar pro encontro.
+    >Pedro guarda as roupas e a poção e começa a sair da loja.
+    Medeia:
+    Vai lá garanhão! Ou garanhona, como preferir.
+    >Ele levanta o dedo do meio para Medeia e sai com cara de envergonhado.
+    >No parque...
+    >Pedro está escondido atrás de uma árvore, ansioso e preocupado.
+    Pedro:
+    Por que ainda não fez efeito? Meu corpo tá exatamente igual, minha voz e tudo mais!
+    Eu devia saber que era só enrolação, aquela menina tava me enganando. Ela vai ver só!
+    Mas e agora, o que eu faço?
+    >Pedro olha atrás da árvore e vê Gabriel sentando num banco.
+    >Ele parece estar procurando alguém.
+    Pedro:
+    Será que eu vou embora?
+    Ele vai ficar tão desapontado... Vai ficar achando que levou um toco.
+    Ah, mas o que adianta? Se vou for até lá ele vai ficar mais decepcionado ainda depois que descobrir que a menina que ele estava conversando no Kinder
+    era o amigo xexelento dele da escola...
+    Eu não sei porque eu sequer achei que teria uma chance das coisas darem certo entre eu e ele.
+    É melhor eu ir embora e fingir que nada disso aconteceu...
+    >Pedro começa a ir embora cabisbaixo.
+    Gabriel:
+    Pedroca! Mano, o que que você tá fazendo aqui no parque!?
+    >Gabriel vê Pedro na distância e começa a andar até ele.
+    Pedro:
+    (DROGA! Ele me viu, o que eu faço?!)
+    E aí, cara... Que coincidência, haha...
+    Gabriel:
+    Você não vai acreditar! Eu tô esperando a maior gata, a gente vai sair num encontro.
+    Conheci ela no Kinder, ela é até meio parecida com você.
+    Huh... Enfim! Como você tá? Sair pra passear num parquinho não é muito a sua cara.
+    Pedro:
+    É, eu prefiro o cemitério mesmo...
+    Gabriel:
+    Hahaha! Sabe que ela, a Petrônia, queria que nós fossemos num cemitério?
+    De noite, ainda por cima!
+    Eu sou muito medroso, não aceitei...
+    Será que é por isso que ela não apareceu ainda, porque ela preferia o cemitério?...
+    Pedro:
+    (Meu deus, isso é tortura.)
+    Olha, cara, ela deve ter se atraso ou confundiu o caminho pra cá.
+    Eu vou lá, tá bom? Não quero atrapalhar teu encontro...
+    >Pedro tenta se afastar mas Gabriel segura ele pelo braço.
+    Gabriel:
+    Já sei! Você me deu uma ideia.
+    Vou mandar uma mensagem pra ela, se ela estiver por perto vou escutar o barulho do toque!
+    Pedro:
+    Certo, então...
+    Espero que você ache ela.
+    >Gabriel pega o telefone e começa a digitar.
+    Pedro:
+    (Espera aí...)
+    NÃO, NÃO FAZ ISS-
+    >O silêncio do parque é interrompido por um barulho de vibração vindo do bolso de Pedro.
+    Gabriel:
+    ...
+    Huh, que esquisito.
+    Vou tentar mandar denovo.
+    Pedro:
+    NÃO, PERA!
+    >Gabriel manda outra mensagem e o barulho se repete.
+    Não é o que você tá pensando...
