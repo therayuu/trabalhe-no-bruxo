@@ -13,16 +13,16 @@ void menu_setup(SDL_Renderer* ren) {
 
 const int w = W_WIDTH/5, h = W_HEIGHT/10, pad = h/10, sep = h + pad;
 static SDL_Rect botoes[] = {
-    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT - sep*4 + sep/8 + sep*0, .w=w, .h=h },
-    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT - sep*4 + sep/8 + sep*1, .w=w, .h=h },
-    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT - sep*4 + sep/8 + sep*2, .w=w, .h=h },
+    { .x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*0, .w=w, .h=h },
+    { .x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*1, .w=w, .h=h },
+    { .x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*2, .w=w, .h=h },
 };
 
 enum tela tela_do_botao(const SDL_Rect* bot) {
     enum { JOGAR=0, CONF, SAIR };
     if (bot == &botoes[JOGAR]) return MESA;
     if (bot == &botoes[CONF])  return MENU; //!
-    if (bot == &botoes[SAIR])  return MENU; //!
+    if (bot == &botoes[SAIR])  return ZERO; //!
     return MENU;
 }
 

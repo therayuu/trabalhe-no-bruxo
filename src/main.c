@@ -6,6 +6,7 @@
 #include "AUX.h"
 #include "comum.h"
 #include "menu.c"
+#include "mesa.c"
 
 
 int main() {
@@ -31,15 +32,25 @@ int main() {
         switch (tela) {
             case ZERO: prox = MENU; break;
             case MENU: prox = menu_loop(ren, evt); break;
-            case MESA: break;
+            case MESA: prox = mesa_loop(ren, evt); break;
+        }
+
+        switch (prox_diff(tela, prox)) {
+            case ZERO: break;
+            case MENU: menu_setup(ren); break;
+            case MESA: mesa_setup(ren); break;
+        }
+
+        switch (curr_diff(tela, prox)) {
+            case ZERO: break;
+            case MENU: menu_free(ren); break;
+            case MESA: mesa_free(ren); break;
         }
 
         switch (trans(tela, prox)) {
-            case trans(ZERO, MENU):
-            case trans(MESA, MENU): menu_setup(ren); break;
-            case trans(MENU, MESA):
-            case trans(MENU, ZERO): menu_free(ren); break;
+            case trans(MENU, ZERO): evt.type = SDL_QUIT; break;
         }
+
         tela = prox;
     }
 

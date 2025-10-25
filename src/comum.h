@@ -7,6 +7,8 @@
 #define TIMEOUT 1000/FPS
 
 #define trans(prev, curr) (((uint16_t)prev<<8) | ((uint16_t)curr))
+#define prox_diff(prev, curr) (((prev) != (curr)) ? curr : ZERO)
+#define curr_diff(prev, curr) (((prev) != (curr)) ? prev : ZERO)
 
 
 enum tela {
