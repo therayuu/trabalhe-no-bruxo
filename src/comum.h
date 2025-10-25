@@ -17,3 +17,6 @@ enum tela {
     MESA,
 };
 
+typedef enum {
+    AUX_SURECLICKEVENT = AUX_FIRSTUSEREVENT,
+} UserEventType;
