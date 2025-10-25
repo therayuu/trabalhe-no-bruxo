@@ -11,6 +11,8 @@ main: main.exe
 run: main.exe
 	./main.exe
 
+main.exe: lib/AUX.h lib/cores.h menu.c
+
 %.exe: %.c
 	gcc $< -o $@ $(CFLAGS) $(LFLAGS)
 
