@@ -11,11 +11,11 @@ void menu_setup(SDL_Renderer* ren) {
     assert(menu.img != NULL);
 }
 
-const int w = W_WIDTH/5, h = W_HEIGHT/10, pad = h/10;
+const int w = W_WIDTH/5, h = W_HEIGHT/10, pad = h/10, sep = h + pad;
 static SDL_Rect botoes[] = {
-    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT/2 + (h+pad)*0, .w=w, .h=h },
-    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT/2 + (h+pad)*1, .w=w, .h=h },
-    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT/2 + (h+pad)*2, .w=w, .h=h },
+    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT - sep*4 + sep/8 + sep*0, .w=w, .h=h },
+    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT - sep*4 + sep/8 + sep*1, .w=w, .h=h },
+    { .x=W_WIDTH/2 - w/2, .y=W_HEIGHT - sep*4 + sep/8 + sep*2, .w=w, .h=h },
 };
 
 enum tela tela_do_botao(const SDL_Rect* bot) {
