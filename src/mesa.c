@@ -81,16 +81,23 @@ void mesa_setup(SDL_Renderer* ren) {
     mesa.init = true;
 }
 
-const int rw = W_WIDTH/10, hmid = (W_HEIGHT-rw)/2;
-static DragDropRect quadrados[4] = {
-  { .r.x = W_WIDTH*1/3-rw/2, .r.y = hmid,    .r.w=rw, .r.h=rw },
-  { .r.x = W_WIDTH*2/3-rw/2, .r.y = hmid,    .r.w=rw, .r.h=rw },
-  { .r.x = W_WIDTH/2  -rw/2, .r.y = hmid-rw, .r.w=rw, .r.h=rw },
-  { .r.x = W_WIDTH/2  -rw/2, .r.y = hmid+rw, .r.w=rw, .r.h=rw },
-};
-static size_t clicks[4] = {0};
-
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
+    const int rw = W_WIDTH/10, rh = rw*3/2,
+              sep = rw+pad, hmid = (W_HEIGHT-rh)/2;
+    static DragDropRect quadrados[] = {
+        { .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*1, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*2, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*3, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*4, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*5, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*6, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*7, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*8, .r.y = hmid, .r.w=rw, .r.h=rh },
+        { .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh },
+    };
+    static size_t clicks[LEN(quadrados)] = {0};
+
     enum tela prox_tela = MESA;
     switch (evt.type) {
       case SDL_KEYUP: switch (evt.key.keysym.sym) {
