@@ -43,8 +43,8 @@ int main() {
 
         switch (curr_diff(tela, prox)) {
             case ZERO: break;
-            case MENU: menu_free(ren); break;
-            case MESA: mesa_free(ren); break;
+            case MENU: menu_free(); break;
+            case MESA: mesa_free(); break;
         }
 
         switch (trans(tela, prox)) {

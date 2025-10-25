@@ -12,6 +12,10 @@
 #define LEN(arr) (sizeof(arr)/sizeof(*arr))
 #define UNUSED(x) (void) x
 
+#define as(T) *(T*)&
+#define transmute(T, x) (as(T)x)
+
+#define fall [[fallthrough]]
 
 /* EVENTOS */
 #define DT(...) AUX_dt(__VA_ARGS__)

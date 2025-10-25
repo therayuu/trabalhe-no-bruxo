@@ -1,4 +1,7 @@
-CFLAGS = -Wall -Wextra -I lib/
+LIBS = $(wildcard lib/*.h) $(wildcard lib/*.c)
+CORE = $(wildcard *.c)
+
+CFLAGS = -Wall -Wextra --std=c23 -I lib/
 LFLAGS = -lm -lSDL2 -lSDL2_ttf -lSDL2_image
 
 ifneq ($(shell command -v pkg-config;),)
@@ -11,7 +14,7 @@ main: main.exe
 run: main.exe
 	./main.exe
 
-main.exe: lib/AUX.h lib/cores.h menu.c
+main.exe: $(LIBS) $(CORE)
 
 %.exe: %.c
 	gcc $< -o $@ $(CFLAGS) $(LFLAGS)

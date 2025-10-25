@@ -13,9 +13,9 @@ void menu_setup(SDL_Renderer* ren) {
 
 const int w = W_WIDTH/5, h = W_HEIGHT/10, pad = h/10, sep = h + pad;
 static SDL_Rect botoes[] = {
-    { .x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*0, .w=w, .h=h },
-    { .x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*1, .w=w, .h=h },
-    { .x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*2, .w=w, .h=h },
+    {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*0, .w=w, .h=h},
+    {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*1, .w=w, .h=h},
+    {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*2, .w=w, .h=h},
 };
 
 enum tela tela_do_botao(const SDL_Rect* bot) {
@@ -34,7 +34,7 @@ enum tela menu_loop(SDL_Renderer* ren, SDL_Event evt) {
           case SDLK_LEFT:  menu.cursor = 0; break;
           case SDLK_RIGHT: menu.cursor = LEN(botoes)-1; break;
 
-          uint8_t inc = 0; {
+          uint8_t inc = 0; fall; {
               case SDLK_DOWN: inc = 1; goto setas;
               case SDLK_UP:   inc = LEN(botoes) - 1;
               setas: {
@@ -49,19 +49,18 @@ enum tela menu_loop(SDL_Renderer* ren, SDL_Event evt) {
       } break;
 
       case SDL_MOUSEBUTTONUP: {
-          const SDL_Rect r = { evt.button.x, evt.button.y, 1,1 };
+          const SDL_Point p = { evt.button.x, evt.button.y };
           for (size_t i = 0; i < LEN(botoes); i++) {
               const SDL_Rect* bot = &botoes[i];
-              if (SDL_HasIntersection(bot, &r))
-                  prox_tela = tela_do_botao(bot);
+              if (SDL_PointInRect(&p, bot)) prox_tela = tela_do_botao(bot);
           }
       } break;
 
       case SDL_MOUSEMOTION: {
-          const SDL_Rect r = { evt.motion.x, evt.motion.y, 1,1 };
+          const SDL_Point p = { evt.motion.x, evt.motion.y };
           for (size_t i = 0; i < LEN(botoes); i++) {
               const SDL_Rect* bot = &botoes[i];
-              if (SDL_HasIntersection(bot, &r)) {
+              if (SDL_PointInRect(&p, bot)) {
                   menu.cursor = i; break;
               }
           }
@@ -76,7 +75,7 @@ enum tela menu_loop(SDL_Renderer* ren, SDL_Event evt) {
                   const SDL_Rect* bot = &botoes[i];
                   if (i == menu.cursor) AUX_SetRenderDrawColor(ren, AZUL);
                   else                  AUX_SetRenderDrawColor(ren, BRANCO);
-                  SDL_RenderDrawRect(ren, bot);
+                  SDL_RenderFillRect(ren, bot);
               }
               SDL_RenderPresent(ren);
           } break;
