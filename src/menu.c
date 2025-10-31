@@ -1,8 +1,16 @@
+#include <SDL2/SDL.h>
+#include "lib/AUX.h"
+
+#include <assert.h>
+#include <inttypes.h>
+
+
 struct estado_menu {
     bool init;
     uint8_t cursor;
     SDL_Texture* img;
 } menu;
+
 
 void menu_setup(SDL_Renderer* ren) {
     menu.init = true;
@@ -11,19 +19,48 @@ void menu_setup(SDL_Renderer* ren) {
     assert(menu.img != NULL);
 }
 
+//! fazer struct botão
 const int w = W_WIDTH/5, h = W_HEIGHT/10, pad = h/10, sep = h + pad;
 static SDL_Rect botoes[] = {
     {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*0, .w=w, .h=h},
     {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*1, .w=w, .h=h},
     {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*2, .w=w, .h=h},
 };
+static const SDL_Rect* bot_jogar = &botoes[0];
+static const SDL_Rect* bot_conf  = &botoes[1];
+static const SDL_Rect* bot_sair  = &botoes[2];
 
 enum tela tela_do_botao(const SDL_Rect* bot) {
-    enum { JOGAR=0, CONF, SAIR };
-    if (bot == &botoes[JOGAR]) return MESA;
-    if (bot == &botoes[CONF])  return MENU; //!
-    if (bot == &botoes[SAIR])  return ZERO; //!
+    if (bot == bot_jogar) return MESA;
+    if (bot == bot_conf)  return MENU; //!
+    if (bot == bot_sair)  return ZERO; //!
     return MENU;
+}
+char* nome_do_botao(const SDL_Rect* bot) {
+    if (bot == bot_jogar) return "jogar";
+    if (bot == bot_conf)  return "conf";
+    if (bot == bot_sair)  return "sair";
+    return "";
+}
+
+void desenhar_botoes(SDL_Renderer* ren) {
+    for (size_t i = 0; i < LEN(botoes); i++) {
+        SDL_Color fundo, frente;
+        if (i == menu.cursor) { fundo = AZUL; frente = BRANCO; }
+        else                  { fundo = BRANCO; frente = AZUL; }
+
+        const SDL_Rect* bot = &botoes[i];
+        const char* texto = nome_do_botao(bot);
+
+        AUX_SetRenderDrawColor(ren, fundo);
+        SDL_RenderFillRect(ren, bot);
+        AUX_SetRenderDrawColor(ren, frente);
+
+        //! centralizar horizontalmente (quando tiver um struct)
+        const int tam = bot->h*2/6, xpad = bot->w/10, ypad = bot->h/10;
+        AUX_DrawTextRects(ren, texto, tam, bot->x + xpad + tam/2,
+                                           bot->y + ypad + tam/2);
+    }
 }
 
 enum tela menu_loop(SDL_Renderer* ren, SDL_Event evt) {
@@ -43,7 +80,7 @@ enum tela menu_loop(SDL_Renderer* ren, SDL_Event evt) {
               }
           } break;
 
-          case SDLK_RETURN: {
+          case SDLK_SPACE: case SDLK_RETURN: {
               prox_tela = tela_do_botao(&botoes[menu.cursor]);
           } break;
       } break;
@@ -71,12 +108,7 @@ enum tela menu_loop(SDL_Renderer* ren, SDL_Event evt) {
               AUX_RenderClearColor(ren, BRANCO);
               AUX_RenderBackgroundImage(ren, menu.img);
 
-              for (size_t i = 0; i < LEN(botoes); i++) {
-                  const SDL_Rect* bot = &botoes[i];
-                  if (i == menu.cursor) AUX_SetRenderDrawColor(ren, AZUL);
-                  else                  AUX_SetRenderDrawColor(ren, BRANCO);
-                  SDL_RenderFillRect(ren, bot);
-              }
+              desenhar_botoes(ren);
               SDL_RenderPresent(ren);
           } break;
       }
