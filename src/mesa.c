@@ -1,76 +1,9 @@
+#include <SDL2/SDL.h>
+#include "AUX.h"
+
 #include <assert.h>
+#include <inttypes.h>
 
-#define asClick(evt) transmute(SDL_MouseButtonEvent, evt)
-
-static inline
-void AUX_ToEndSzLen(void* arr, size_t size, size_t len, size_t idx);
-#define AUX_ToEndLen(arr, len, i) AUX_ToEndSzLen(arr, sizeof(*arr), len, i)
-#define AUX_ToEnd(arr, i) AUX_ToEndLen(arr, LEN(arr), i)
-
-typedef struct {
-    SDL_Rect r;
-
-    SDL_MouseButtonEvent click;
-    SDL_Point offset;
-    enum {
-        UNCLICKED = 0,
-        CLICKING,
-        DRAGGING,
-
-        DRAG_STATE_COUNT,
-    } state;
-} DragDropRect;
-
-
-void AUX__FillSureClick(SDL_Event* evt, DragDropRect* rect) {
-     evt->user = (SDL_UserEvent) {
-         .type = SDL_USEREVENT,
-         .code = AUX_SURECLICKEVENT,
-         .data1 = rect,
-         .timestamp = SDL_GetTicks(),
-     };
-}
-void AUX__EmitSureClick(DragDropRect* rect) {
-    SDL_Event evt; AUX__FillSureClick(&evt, rect);
-    SDL_PushEvent(&evt);
-}
-
-void AUX_DragDropCancel(DragDropRect* self, SDL_Event evt) {
-    const bool clicked = (self->state == CLICKING) ||
-                         (self->state == DRAGGING);
-
-    switch (evt.type) {
-      case SDL_KEYDOWN: switch (evt.key.keysym.sym) {
-          case SDLK_ESCAPE: if (clicked) {
-              self->r.x = self->click.x + self->offset.x;
-              self->r.y = self->click.y + self->offset.y;
-
-              self->state = UNCLICKED;
-          } break;
-      } break;
-      case SDL_MOUSEBUTTONDOWN: {
-          SDL_Point loc = { evt.button.x, evt.button.y };
-          if (SDL_PointInRect(&loc, &self->r)) {
-              self->offset.x = self->r.x - loc.x;
-              self->offset.y = self->r.y - loc.y;
-              self->click = asClick(evt);
-
-              self->state = CLICKING;
-          }
-      } break;
-      case SDL_MOUSEBUTTONUP: {
-          if (self->state == CLICKING) AUX__EmitSureClick(self);
-
-          self->state = UNCLICKED;
-      } break;
-      case SDL_MOUSEMOTION: if (clicked) {
-          self->r.x = evt.button.x + self->offset.x;
-          self->r.y = evt.button.y + self->offset.y;
-
-          self->state = DRAGGING;
-      } break;
-    }
-}
 
 struct estado_mesa {
     bool init;
@@ -106,7 +39,6 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 
       case SDL_USEREVENT: switch (evt.user.code) {
           case AUX_SURECLICKEVENT: {
-              // size_t idx = evt.user.data1 - (void*)quadrados;
               clicks[LEN(clicks)-1] += 1;
           } break;
 
@@ -142,22 +74,5 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 
 void mesa_free() {
     mesa.init = false;
-}
-
-static inline
-void AUX_ToEndSzLen(void* arr, size_t size, size_t len, size_t idx) {
-  #define elem(arr, size, idx) ((arr) + (size)*(idx))
-    char *const base = arr;
-    char *const curr = elem(base, size, idx);
-
-    char buf[size];
-    memcpy(buf, curr, size);
-
-    char *const next = elem(base, size, idx+1);
-    char *const last = elem(base, size, len-1);
-
-    memmove(curr, next, last-curr);
-    memcpy(last, buf, size);
-  #undef elem
 }
 

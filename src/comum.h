@@ -1,3 +1,6 @@
+#ifndef _COMUM_H_
+#define _COMUM_H_
+
 #define ASSETS "../assets/"
 
 #define W_WIDTH  1080
@@ -18,5 +21,7 @@ enum tela {
 };
 
 typedef enum {
-    AUX_SURECLICKEVENT = AUX_FIRSTUSEREVENT,
+    AUX_NOEVENT = AUX_FIRSTUSEREVENT,
 } UserEventType;
+
+#endif//_COMUM_H_

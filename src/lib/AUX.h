@@ -18,6 +18,7 @@
 
 #define fall [[fallthrough]]
 
+
 /* EVENTOS */
 #define DT(...) AUX_dt(__VA_ARGS__)
 int32_t AUX_dt(uint32_t antes, uint32_t* depois) {
@@ -30,6 +31,7 @@ int32_t AUX_dt(uint32_t antes, uint32_t* depois) {
 
 typedef enum {
     AUX_TIMEOUTEVENT = 0,
+    AUX_SURECLICKEVENT,
     AUX_FIRSTUSEREVENT,
 } AUX_EventType;
 
@@ -107,6 +109,26 @@ void AUX_CenterRect(SDL_Rect* inner, SDL_Rect outer) {
     };
     inner->x = c.x - r.w/2;
     inner->y = c.y - r.h/2;
+}
+
+/* MISCELÂNEA */
+static inline
+#define AUX_ToEnd(arr, i) AUX_ToEndLen(arr, LEN(arr), i)
+#define AUX_ToEndLen(arr, len, i) AUX_ToEndSzLen(arr, sizeof(*arr), len, i)
+void AUX_ToEndSzLen(void* arr, size_t size, size_t len, size_t idx) {
+  #define elem(arr, size, idx) ((arr) + (size)*(idx))
+    char *const base = arr;
+    char *const curr = elem(base, size, idx);
+
+    char buf[size];
+    memcpy(buf, curr, size);
+
+    char *const next = elem(base, size, idx+1);
+    char *const last = elem(base, size, len-1);
+
+    memmove(curr, next, last-curr);
+    memcpy(last, buf, size);
+  #undef elem
 }
 
 
@@ -264,8 +286,8 @@ typedef struct {
     SDL_Rect box;
     char* label;
     union {
-        void* ptr;
         intptr_t id, out;
+        void* ptr;
     };
 } AUX_Button;
 
@@ -285,5 +307,71 @@ void AUX_DrawButton(SDL_Renderer* ren, AUX_Button bot,
     AUX_DrawTextRects(ren, label, tam, text_box.x, text_box.y);
 }
 
+/** RETÂNGULO ARRASTÁVEL **/
+typedef struct drag_drop_rect {
+    SDL_Rect r;
+
+    SDL_MouseButtonEvent click;
+    SDL_Point offset;
+    enum {
+        UNCLICKED = 0,
+        CLICKING,
+        DRAGGING,
+
+        DRAG_STATE_COUNT,
+    } state;
+} DragDropRect;
+
+void AUX__FillSureClick(SDL_Event* evt, DragDropRect* rect) {
+     evt->user = (SDL_UserEvent) {
+         .type = SDL_USEREVENT,
+         .code = AUX_SURECLICKEVENT,
+         .data1 = rect,
+         .timestamp = SDL_GetTicks(),
+     };
+}
+void AUX__EmitSureClick(DragDropRect* rect) {
+    SDL_Event evt; AUX__FillSureClick(&evt, rect);
+    SDL_PushEvent(&evt);
+}
+
+void AUX_DragDropCancel(DragDropRect* self, SDL_Event evt) {
+  #define asClick(evt) transmute(SDL_MouseButtonEvent, evt)
+    const bool clicked = (self->state == CLICKING) ||
+                         (self->state == DRAGGING);
+
+    switch (evt.type) {
+      case SDL_KEYDOWN: switch (evt.key.keysym.sym) {
+          case SDLK_ESCAPE: if (clicked) {
+              self->r.x = self->click.x + self->offset.x;
+              self->r.y = self->click.y + self->offset.y;
+
+              self->state = UNCLICKED;
+          } break;
+      } break;
+      case SDL_MOUSEBUTTONDOWN: {
+          SDL_Point loc = { evt.button.x, evt.button.y };
+          if (SDL_PointInRect(&loc, &self->r)) {
+              self->offset.x = self->r.x - loc.x;
+              self->offset.y = self->r.y - loc.y;
+              self->click = asClick(evt);
+
+              self->state = CLICKING;
+          }
+      } break;
+      case SDL_MOUSEBUTTONUP: {
+          if (self->state == CLICKING) AUX__EmitSureClick(self);
+
+          self->state = UNCLICKED;
+      } break;
+      case SDL_MOUSEMOTION: if (clicked) {
+          self->r.x = evt.button.x + self->offset.x;
+          self->r.y = evt.button.y + self->offset.y;
+
+          self->state = DRAGGING;
+      } break;
+    }
+  #undef asClick
+}
 
 #endif//_AUX_H_
