@@ -99,6 +99,16 @@ void TFX_WrapRectPosF(SDL_FRect* ret, const SDL_Rect win) {
     if (ret->y+ret->h > win.y+win.h) ret->y = win.y;
 }
 
+void AUX_CenterRect(SDL_Rect* inner, SDL_Rect outer) {
+    SDL_Rect r = *inner;
+    SDL_Point c = {
+        .x = outer.x + outer.w/2,
+        .y = outer.y + outer.h/2,
+    };
+    inner->x = c.x - r.w/2;
+    inner->y = c.y - r.h/2;
+}
+
 
 /* GRÁFICOS */
 SDL_Color AUX_GetRenderDrawColor(SDL_Renderer *renderer) {
@@ -138,6 +148,13 @@ void AUX_DrawRectsAt(SDL_Renderer* ren,
     for (size_t i = 0; i<len; i++) {
         AUX_DrawRectAt(ren, rects[i], x, y);
     }
+}
+
+SDL_Rect AUX_MeasureTextRects(const char* text, int font_sz) {
+    return (SDL_Rect){
+        .w = font_sz*(strlen(text)+1), //! isso aqui parece muito errado
+        .h = font_sz,
+    };
 }
 
 void AUX_DrawTextRects(SDL_Renderer* ren,
@@ -239,5 +256,34 @@ void AUX_DrawTextRects(SDL_Renderer* ren,
                              x+(tam_fonte+pad)*i, y);
     }
 }
+
+/* OBJETOS */
+
+/** BOTÃO **/
+typedef struct {
+    SDL_Rect box;
+    char* label;
+    union {
+        void* ptr;
+        intptr_t id, out;
+    };
+} AUX_Button;
+
+void AUX_DrawButton(SDL_Renderer* ren, AUX_Button bot,
+                                       SDL_Color fundo,
+                                       SDL_Color frente) {
+    const SDL_Rect box = bot.box;
+    const char* label = bot.label;
+    const int tam = box.h*2/6;
+
+    AUX_SetRenderDrawColor(ren, fundo);
+    SDL_RenderFillRect(ren, &box);
+    AUX_SetRenderDrawColor(ren, frente);
+
+    SDL_Rect text_box = AUX_MeasureTextRects(label, tam);
+                        AUX_CenterRect(&text_box, box);
+    AUX_DrawTextRects(ren, label, tam, text_box.x, text_box.y);
+}
+
 
 #endif//_AUX_H_
