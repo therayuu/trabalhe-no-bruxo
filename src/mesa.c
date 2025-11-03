@@ -17,7 +17,7 @@ enum tipo_carta {
 };
 
 struct carta {
-    DragDropRect rect;
+    DragDropRect drag;
     enum tipo_carta tipo;
     uint16_t cliques;
 };
@@ -78,34 +78,34 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
               sep = rw+pad, hmid = (W_HEIGHT-rh)/2;
     static struct carta cartas[] = {
         {
-            .rect = { .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 0, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*1, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*1, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 1, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*2, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*2, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 2, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*3, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*3, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 3, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*4, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*4, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 4, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*5, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*5, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 0, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*6, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*6, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 1, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*7, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*7, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 2, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*8, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*8, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 3, .cliques = 0,
         }, {
-            .rect = { .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh },
+            .drag = { .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh },
             .tipo = 4, .cliques = 0,
         },
     };
@@ -134,8 +134,8 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     }
 
     for (size_t i = LEN(cartas); i--; ) {
-        AUX_DragDropCancel(&cartas[i].rect, evt);
-        if (cartas[i].rect.state != UNCLICKED) {
+        AUX_DragDropCancel(&cartas[i].drag, evt);
+        if (cartas[i].drag.state != UNCLICKED) {
             AUX_ToEnd(cartas, i); break;
         }
     }
