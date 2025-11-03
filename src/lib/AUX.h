@@ -69,7 +69,7 @@ void AUX_NextEvent(SDL_Event* evt, uint32_t* falta, uint32_t timeout) {
 
 
 /* MATEMÁTICA */
-void TFX_ClampRectPos(SDL_Rect* ret, const SDL_Rect win) {
+void AUX_ClampRectPos(SDL_Rect* ret, const SDL_Rect win) {
     if (ret->x < win.x) ret->x = win.x;
     if (ret->y < win.y) ret->y = win.y;
 
@@ -77,7 +77,7 @@ void TFX_ClampRectPos(SDL_Rect* ret, const SDL_Rect win) {
     if (ret->y+ret->h > win.y+win.h) ret->y = win.y+win.h - ret->h;
 }
 
-void TFX_ClampRectPosF(SDL_FRect* ret, const SDL_Rect win) {
+void AUX_ClampRectPosF(SDL_FRect* ret, const SDL_Rect win) {
     if (ret->x < win.x) ret->x = win.x;
     if (ret->y < win.y) ret->y = win.y;
 
@@ -85,7 +85,7 @@ void TFX_ClampRectPosF(SDL_FRect* ret, const SDL_Rect win) {
     if (ret->y+ret->h > win.y+win.h) ret->y = win.y+win.h - ret->h;
 }
 
-void TFX_WrapRectPos(SDL_Rect* ret, const SDL_Rect win) {
+void AUX_WrapRectPos(SDL_Rect* ret, const SDL_Rect win) {
     if (ret->x < win.x) ret->x = win.x+win.w - ret->w;
     if (ret->y < win.y) ret->y = win.y+win.h - ret->h;
 
@@ -93,7 +93,7 @@ void TFX_WrapRectPos(SDL_Rect* ret, const SDL_Rect win) {
     if (ret->y+ret->h > win.y+win.h) ret->y = win.y;
 }
 
-void TFX_WrapRectPosF(SDL_FRect* ret, const SDL_Rect win) {
+void AUX_WrapRectPosF(SDL_FRect* ret, const SDL_Rect win) {
     if (ret->x < win.x) ret->x = win.x+win.w - ret->w;
     if (ret->y < win.y) ret->y = win.y+win.h - ret->h;
 
@@ -133,6 +133,13 @@ void AUX_ToEndSzLen(void* arr, size_t size, size_t len, size_t idx) {
 
 
 /* GRÁFICOS */
+typedef struct {
+    SDL_Texture* img;
+    //! adicionar campo img_path ou algo assim
+    //! adicionar função TextureInit, que tenta ler
+    const SDL_Color* color;
+} AUX_Texture;
+
 SDL_Color AUX_GetRenderDrawColor(SDL_Renderer *renderer) {
     SDL_Color cor;
     SDL_GetRenderDrawColor(renderer, splat(&cor));
@@ -148,12 +155,25 @@ void AUX_RenderClearColor(SDL_Renderer* renderer, SDL_Color cor) {
     SDL_RenderClear(renderer);
 }
 
-//! cortar em vez de amassar a imagem
 void AUX_RenderBackgroundImage(SDL_Renderer* renderer, SDL_Texture* img) {
-    SDL_Rect janela = {0};
-    SDL_GetRendererOutputSize(renderer, &janela.w, &janela.h);
+    //! cortar em vez de amassar a imagem
+    // SDL_Rect janela = {0};
+    // SDL_GetRendererOutputSize(renderer, &janela.w, &janela.h);
+    // //! contas aqui
+    // SDL_RenderCopy(renderer, img, NULL, &janela);
+    SDL_RenderCopy(renderer, img, NULL, NULL);
+}
 
-    SDL_RenderCopy(renderer, img, NULL, &janela);
+void AUX_RenderTexture(SDL_Renderer* ren, const AUX_Texture tex,
+                                          const SDL_Rect* const rect) {
+    if (tex.img) {
+        SDL_RenderCopy(ren, tex.img, NULL, rect);
+    } else if (tex.color) {
+        AUX_SetRenderDrawColor(ren, *tex.color);
+        SDL_RenderFillRect(ren, rect);
+    } else {
+        //! desenhar padrão roxo e preto
+    }
 }
 
 
@@ -308,18 +328,20 @@ void AUX_DrawButton(SDL_Renderer* ren, AUX_Button bot,
 }
 
 /** RETÂNGULO ARRASTÁVEL **/
+typedef enum drag_drop_state {
+    UNCLICKED = 0,
+    CLICKING,
+    DRAGGING,
+
+    DRAG_STATE_COUNT,
+} DragDropState;
+
 typedef struct drag_drop_rect {
     SDL_Rect r;
 
+    DragDropState state;
     SDL_MouseButtonEvent click;
     SDL_Point offset;
-    enum {
-        UNCLICKED = 0,
-        CLICKING,
-        DRAGGING,
-
-        DRAG_STATE_COUNT,
-    } state;
 } DragDropRect;
 
 void AUX__FillSureClick(SDL_Event* evt, DragDropRect* rect) {
