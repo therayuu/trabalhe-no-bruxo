@@ -25,17 +25,21 @@ Da história central e de duas rotas que o jogador pode seguir.
 ![Diálogo de introdução](img/diálogo-intro-avanços-2.png)
 ![Diálogo com um cliente](img/diálogo-pedro-avanços-2.png)
 
-A princípio o diálogo e rotas seriam estruturados por uma árvore encadeada, mas foi decidido que o texto será adaptado para Markdown e um interpretador o transformará nessa estrutura de dados.
+A princípio o diálogo e rotas seriam estruturados por uma árvore encadeada, mas foi decidido que o texto será adaptado para Markdown e um parser o transformará nessa estrutura de dados (que o nosso programa interpretaria).
 
 ## Arte
-A arte das cartas tem sprites, um que é um fundo igual para todas as cartas e outro que é um sprite transparente com a arte dos elementos.
 
-As artes foram feitas no aseprite (compilado na mão, de graça).
+Cada carta é feita com 2 sprites, um que é um fundo igual para todas as cartas e outro que é semi-transparente com a arte específica dos elementos.
 
+As artes foram feitas no aseprite\*
+
+![Fundo das cartas](../assets/fundo_carta.png)
 ![Carta do elemento de água](../assets/carta_agua.png)
 ![Carta do elemento de fogo](../assets/carta_fogo.png)
 ![Carta do elemento de ar](../assets/carta_ar.png)
 ![Carta do elemento de terra](../assets/carta_terra.png)
+
+\*(compilado na mão).
 
 # Demonstração
 
