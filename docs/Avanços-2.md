@@ -8,34 +8,34 @@ author: Rafaela Grillo & Theo Albuquerque & Yuri Sacksida
 
 ## Menu
 
-![menu atual do jogo](img/menu-avanços-2.png)
+![Menu atual do jogo](img/menu-avanços-2.png)
 
 ## Elementos
 
-![cartas organizadas](img/cartas-organizadas-avanços-2.png)
+![Cartas organizadas](img/cartas-organizadas-avanços-2.png)
 
 ## Elementos
 
-![cartas desorganizadas](img/cartas-desorganizadas-avanços-2.png)
+![Cartas desorganizadas](img/cartas-desorganizadas-avanços-2.png)
 
 ## Diálogos
 
-Criamos os diálogos da história central e duas rotas que o jogador pode seguir.
+Da história central e de duas rotas que o jogador pode seguir.
 
-![](img/intro-dialogo.png "Dialogo de introdução")
-![](img/pedro-dialogo.png "Dialogo com um cliente")
+![Diálogo de introdução](img/diálogo-intro-avanços-2.png)
+![Diálogo com um cliente](img/diálogo-pedro-avanços-2.png)
 
 A princípio o diálogo e rotas seriam estruturados por uma árvore encadeada, mas foi decidido que o texto será adaptado para Markdown e um interpretador o transformará nessa estrutura de dados.
 
 ## Arte
 A arte das cartas tem sprites, um que é um fundo igual para todas as cartas e outro que é um sprite transparente com a arte dos elementos.
 
-As artes foram feitas no aseprite.
+As artes foram feitas no aseprite (compilado na mão, de graça).
 
-![](../assets/carta-agua.png "Carta do elemento de água")
-![](../assets/carta-fogo.png "Carta do elemento de fogo")
-![](../assets/carta-ar.png "Carta do elemento de ar")
-![](../assets/carta-terra.png "Carta do elemento de terra")
+![Carta do elemento de água](../assets/carta_agua.png)
+![Carta do elemento de fogo](../assets/carta_fogo.png)
+![Carta do elemento de ar](../assets/carta_ar.png)
+![Carta do elemento de terra](../assets/carta_terra.png)
 
 # Demonstração
 
@@ -46,11 +46,11 @@ As artes foram feitas no aseprite.
 O programa principal é uma máquina de estados de "telas".
 
 Cada tela precisa fornecer 3 funções:
-- [tela]_setup(renderer*)
-- [tela]_loop(renderer*, event)
+- [tela]_setup(renderer\*)
+- [tela]_loop(renderer\*, event)
 - [tela]_free(void)
 
-Internamente, cada tela tem um struct com [partes d]o seu estado.
+Internamente, cada tela teria um struct com o seu estado.\*
 
 ## Geral
 
@@ -117,8 +117,8 @@ int main() { /* ... */
 
 ## Menu
 
-![](maquina-menu.png "Máquina de Estados do Menu")
+![Máquina de Estados do Menu](img/máquina-menu-avanços-2.png)
 
 ## Mesa / Cartas
 
-![drag&drop](img/drag&drop-avanços-2.png)
+![Drag&Drop](img/máquina-drag&drop-avanços-2.png)
