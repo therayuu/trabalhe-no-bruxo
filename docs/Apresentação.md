@@ -2,7 +2,7 @@
 title: Trabalhe no Bruxó
 subtitle: Jogo para a eletiva de GUIs \vspace{-1.5em}
 author: Rafaela Grillo & Theo Albuquerque & Yuri Sacksida
-date: \vspace{-2.5em} ![Tela inicial do jogo](../img/menu.jpg)
+date: \vspace{-2.5em} ![Tela inicial do jogo](img/menu.jpg)
 ...
 
 # Ideia básica
