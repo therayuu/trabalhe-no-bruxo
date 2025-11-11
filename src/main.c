@@ -19,6 +19,7 @@ int main() {
                          W_WIDTH, W_HEIGHT, SDL_WINDOW_SHOWN
                       );
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, 0);
+    SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 
     /* ESTADO */
     enum tela tela = ZERO;

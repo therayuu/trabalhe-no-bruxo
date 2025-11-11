@@ -22,13 +22,13 @@ struct carta {
     uint16_t cliques;
 };
 
-static AUX_Texture fundo_carta = { .color = &PRETO };
+static AUX_Texture fundo_carta = { .img_path = ASSETS"fundo_carta.png" };
 static AUX_Texture imagens_cartas[NUM_TIPOS_CARTA] = {
-    [CARTA_NADA ] = { .color = NULL },
-    [CARTA_AGUA ] = { .color = &AZUL },
-    [CARTA_FOGO ] = { .color = &LARANJA },
-    [CARTA_TERRA] = { .color = &MARROM },
-    [CARTA_AR   ] = { .color = &BRANCO },
+    [CARTA_NADA ] = { .color = &TRANSPARENTE },
+    [CARTA_AGUA ] = { .img_path = ASSETS"carta_agua.png" },
+    [CARTA_FOGO ] = { .img_path = ASSETS"carta_fogo.png" },
+    [CARTA_TERRA] = { .img_path = ASSETS"carta_terra.png" },
+    [CARTA_AR   ] = { .img_path = ASSETS"carta_ar.png" },
 };
 void desenhar_carta(SDL_Renderer* ren, const struct carta carta) {
     const SDL_Rect      rect = transmute(SDL_Rect, carta);
@@ -39,22 +39,28 @@ void desenhar_carta(SDL_Renderer* ren, const struct carta carta) {
     const bool clicada   = (estado == CLICKING);
     const bool arrastada = (estado == DRAGGING);
 
-    if (clicada) { //! desenhar a carta selecionada/maior
-        AUX_SetRenderDrawColor(ren, AZUL);
+    if (virada) { //! desenhar a textura da parte de trás da carta
+        AUX_SetRenderDrawColor(ren, MARROM);
         SDL_RenderFillRect(ren, &rect);
-    } else if (arrastada) { //! desenhar a carta selecionada/maior
-        AUX_SetRenderDrawColor(ren, VERMELHO);
-        SDL_RenderFillRect(ren, &rect);
-    } else if (virada) { //! desenhar a parte de trás da carta
-        AUX_SetRenderDrawColor(ren, CINZA);
-        SDL_RenderFillRect(ren, &rect);
+        return;
     } else {
         AUX_RenderTexture(ren, fundo_carta, &rect);
+        if (clicada) { //! desenhar a carta maior (levantada)
+            AUX_SetRenderDrawColor(ren, AZUL);
+            SDL_RenderFillRect(ren, &rect);
+        } else if (arrastada) { //! desenhar a carta maior (levantada)
+            AUX_SetRenderDrawColor(ren, VERMELHO);
+            SDL_RenderFillRect(ren, &rect);
+        }
     }
 
-    SDL_Rect img = { .w = rect.w/2, .h = rect.w/2 };
-    AUX_CenterRect(&img, rect);
-    AUX_RenderTexture(ren, imagens_cartas[carta.tipo], &img);
+    const int l = rect.w/2;
+    SDL_Rect quad = {.w=l, .h=l};
+    AUX_CenterRect(&quad, rect);
+
+    AUX_Texture tex = imagens_cartas[carta.tipo];
+    if (tex.img) AUX_RenderTexture(ren, tex, &rect);
+    else         AUX_RenderTexture(ren, tex, &quad);
 }
 
 
@@ -63,14 +69,12 @@ struct estado_mesa {
 } mesa;
 
 void mesa_setup(SDL_Renderer* ren) {
-    UNUSED(ren);
     mesa.init = true;
 
+    AUX_TextureInit(ren, &fundo_carta);
     for (size_t i = 0; i < LEN(imagens_cartas); i++) {
-        if (!imagens_cartas[i].color)
-            imagens_cartas[i].color = &CINZA;
+        AUX_TextureInit(ren, &imagens_cartas[i]);
     }
-    imagens_cartas[CARTA_NADA].color = NULL;
 }
 
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
@@ -78,35 +82,25 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
               sep = rw+pad, hmid = (W_HEIGHT-rh)/2;
     static struct carta cartas[] = {
         {
-            .drag = { .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 0, .cliques = 0,
+            .drag = { .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 0,
         }, {
-            .drag = { .r.x = sep*1, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 1, .cliques = 0,
+            .drag = { .r.x = sep*1, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 1,
         }, {
-            .drag = { .r.x = sep*2, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 2, .cliques = 0,
+            .drag = { .r.x = sep*2, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 2,
         }, {
-            .drag = { .r.x = sep*3, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 3, .cliques = 0,
+            .drag = { .r.x = sep*3, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 3,
         }, {
-            .drag = { .r.x = sep*4, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 4, .cliques = 0,
+            .drag = { .r.x = sep*4, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 4,
         }, {
-            .drag = { .r.x = sep*5, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 0, .cliques = 0,
+            .drag = { .r.x = sep*5, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 4,
         }, {
-            .drag = { .r.x = sep*6, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 1, .cliques = 0,
+            .drag = { .r.x = sep*6, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 3,
         }, {
-            .drag = { .r.x = sep*7, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 2, .cliques = 0,
+            .drag = { .r.x = sep*7, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 2,
         }, {
-            .drag = { .r.x = sep*8, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 3, .cliques = 0,
+            .drag = { .r.x = sep*8, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 1,
         }, {
-            .drag = { .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh },
-            .tipo = 4, .cliques = 0,
+            .drag = { .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 0,
         },
     };
 
