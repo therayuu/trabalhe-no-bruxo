@@ -135,8 +135,7 @@ void AUX_ToEndSzLen(void* arr, size_t size, size_t len, size_t idx) {
 /* GRÁFICOS */
 typedef struct {
     SDL_Texture* img;
-    //! adicionar campo img_path ou algo assim
-    //! adicionar função TextureInit, que tenta ler
+    const char* img_path;
     const SDL_Color* color;
 } AUX_Texture;
 
@@ -164,18 +163,30 @@ void AUX_RenderBackgroundImage(SDL_Renderer* renderer, SDL_Texture* img) {
     SDL_RenderCopy(renderer, img, NULL, NULL);
 }
 
-void AUX_RenderTexture(SDL_Renderer* ren, const AUX_Texture tex,
-                                          const SDL_Rect* const rect) {
+void AUX_TextureInit(SDL_Renderer* ren, AUX_Texture* tex) {
+    if (!tex->img && tex->img_path)
+        tex->img = IMG_LoadTexture(ren, tex->img_path);
+}
+
+bool AUX_RenderTextureTry(SDL_Renderer* ren, const AUX_Texture tex,
+                                             const SDL_Rect* const rect) {
     if (tex.img) {
         SDL_RenderCopy(ren, tex.img, NULL, rect);
     } else if (tex.color) {
         AUX_SetRenderDrawColor(ren, *tex.color);
         SDL_RenderFillRect(ren, rect);
-    } else {
-        //! desenhar padrão roxo e preto
-    }
+    } else return false;
+
+    return true;
 }
 
+void AUX_RenderTexture(SDL_Renderer* ren, const AUX_Texture tex,
+                                          const SDL_Rect* const rect) {
+    if (!AUX_RenderTextureTry(ren, tex, rect)) { //! desenhar xadrez roxo
+        AUX_SetRenderDrawColor(ren, MAGENTA);
+        SDL_RenderFillRect(ren, rect);
+    }
+}
 
 /* TEXTO */
 void AUX_DrawRectAt(SDL_Renderer* ren,
