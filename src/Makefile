@@ -19,4 +19,7 @@ main.exe: $(LIBS) $(CORE)
 %.exe: %.c
 	gcc $< -o $@ $(CFLAGS) $(LFLAGS)
 
-.PHONY: run all main
+clean:
+	-rm *.exe
+
+.PHONY: run all main clean
