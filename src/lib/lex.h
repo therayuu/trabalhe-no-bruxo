@@ -25,7 +25,7 @@ long read_file_into_buffer(FILE* f, uint8_t buf[], const size_t len) {
 
     size = ftell(f);
     if (size <= 0) return 0;
-    if (size > len) return len - size;
+    if ((size_t)size > len) return len - size;
 
     if (!buf) return 0;
 
@@ -39,7 +39,7 @@ long read_file_into_buffer(FILE* f, uint8_t buf[], const size_t len) {
 }
 
 size_t read_file_size(FILE* f) {
-    const long diff = read_file_into_buffer(f, NULL, 0),
+    const long diff = read_file_into_buffer(f, NULL, 0);
     if (!diff) return 0;
 
     assert(diff < 0);
@@ -52,7 +52,7 @@ char* slurp_str_from_file(FILE* f, size_t len) {
     char* buf = malloc(len+1);
     assert(buf); buf[len] = '\0';
 
-    long res = read_file_into_buffer(f, buf, len),
+    long res = read_file_into_buffer(f, (uint8_t*)buf, len);
     fclose(f);
 
     if (res <= 0) {
@@ -68,10 +68,10 @@ struct lexer {
     char curr;
     char next;
 
-    char* file_name;
+    const char* file_name;
     size_t line;
     size_t col;
-}
+};
 
 enum token_kind {
     ABRE_TITULO = '#',
@@ -85,12 +85,31 @@ enum token_kind {
     FECHA_LINHA = '\n',
 
     TEXTO = 256,
-    ESPACO,
     INDENTACAO,
+    TOK_EOF,
 };
 
+char* kind_str(enum token_kind kind) {
+    switch (kind) {
+      case ABRE_TITULO : return "#";
+      case FECHA_NOME  : return ":";
+      case ABRE_FALA   : return "-";
+      case ABRE_CITACAO: return ">";
+      case ABRE_COL    : return "[";
+      case FECHA_COL   : return "]";
+      case ABRE_PAR    : return "(";
+      case FECHA_PAR   : return ")";
+      case FECHA_LINHA : return "\\n";
+
+      case TEXTO       : return "TEXTO";
+      case INDENTACAO  : return "INDENTAÇÃO";
+      case TOK_EOF     : return "EOF";
+    }
+    return "TOKEN_INVÁLIDO";
+}
+
 struct token_t {
-    enum token_kind;
+    enum token_kind kind;
     size_t idx, len, line, col;
 };
 
@@ -114,13 +133,11 @@ bool lexer_init(struct lexer* l, const char* const file) {
        .file_name = file,
        .line = 0, .col = 0,
     }; *l = init;
+
+    return true;
 }
 
-struct lexer lexer__advance(struct lexer* l) {
-    l->idx++;
-    l->curr = l->next,
-    l->next = l->buf[l->idx+1],
-
+void lexer__advance(struct lexer* l) { //! -> bool?
     switch (l->curr) {
       case '\n': {
           l->line++;
@@ -129,6 +146,10 @@ struct lexer lexer__advance(struct lexer* l) {
 
       default: l->col++;
     }
+
+    l->idx++;
+    l->curr = l->next;
+    l->next = l->buf[l->idx+1];
 }
 
 bool lexer__is_whitespace(char c) {
@@ -161,8 +182,7 @@ bool lexer__is_simple_token(char c) {
 struct token_t lexer__make_token(struct lexer* start, struct lexer* end,
                                  const enum token_kind kind) {
     //! aqui o fim é no índice do último caracter dentro
-    ////! talvez teja errado
-    return (token_t) {
+    return (struct token_t) {
         .kind = kind,
         .idx = start->idx, .len = end->idx - start->idx + 1,
         .line = start->line, .col = start->col,
@@ -175,6 +195,8 @@ struct token_t lexer_next(struct lexer* l) {
 
     //! decidir se o fim é no próximo caractere ou no atual
     switch (c) {
+        case '\0': return lexer__make_token(&start, &start, TOK_EOF);
+
         case '#':
         case ':':
         case '-':
@@ -198,11 +220,9 @@ struct token_t lexer_next(struct lexer* l) {
         case '\t': {
             while (lexer__is_whitespace(l->next)) lexer__advance(l);
             struct lexer end = *l; lexer__advance(l);
+            if (start.col != 0) return lexer_next(l);
 
-            if (start.col == 0)
-                return lexer__make_token(&start, &end, INDENTACAO);
-            else
-                return lexer__make_token(&start, &end, ESPACO);
+            return lexer__make_token(&start, &end, INDENTACAO);
         } break;
 
         default: {
@@ -211,4 +231,19 @@ struct token_t lexer_next(struct lexer* l) {
             return lexer__make_token(&start, &end, TEXTO);
         } break;
     }
+}
+
+void lexer_fmt_token(struct lexer* lexer, char* buf, struct token_t tok) {
+    int len = tok.len;
+    if (lexer__is_simple_token(tok.kind) || tok.kind == TOK_EOF) len = 0;
+
+    buf += sprintf(buf, "%s", kind_str(tok.kind));
+    if (len)
+        buf += sprintf(buf, "(%.*s)", len, &lexer->buf[tok.idx]);
+}
+
+void lexer_trace(struct lexer* lexer, struct token_t tok) {
+    //! buffer de tamanho fixo
+    static char buf[300]; lexer_fmt_token(lexer, buf, tok);
+    printf("%s:%lu:%lu: %s\n", lexer->file_name, tok.line+1, tok.col+1, buf);
 }
