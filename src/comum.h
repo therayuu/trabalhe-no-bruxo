@@ -18,6 +18,7 @@ enum tela {
     ZERO = 0,
     MENU,
     MESA,
+    DIALOGO,
 };
 
 typedef enum {
