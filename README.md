@@ -6,9 +6,9 @@ Esse projeto consiste num jogo 2D de história baseado em rotas com uma mecânic
 
 ![](docs/img/menu.jpg)
 
-A história se passa numa loja de bruxa (que também é um brechó).
-Você joga como a estagiária da bruxa, atendendo clientes que querem ajuda mágica.
-Eles descrevem o problema e você precisa juntar os elementos corretos para criar uma poção que o resolva.
+A história se passa na loja de uma bruxa (que também é um brechó).
+Você joga como a sua estagiária, atendendo clientes que querem ajuda mágica.
+Eles descrevem os problemas e você precisa juntar os elementos corretos para criar uma poção que os resolva.
 As escolhas que você toma são baseadas no sucesso ou falha ao confeccionar essa poção.
 
 A parte especial do projeto é a mecânica de fusão para criar novos elementos.
