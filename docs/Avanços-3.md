@@ -1,27 +1,28 @@
 ---
 title: Trabalhe no Bruxó
-subtitle: Avanços 2
+subtitle: Avanços 3
 author: Rafaela Grillo & Theo Albuquerque & Yuri Sacksida
 ...
 
 # Estado do jogo
 
 ## Menu
-
 ![Menu atual do jogo](img/menu-avanços-3.png)
 
 ## Elementos
-
 ![Cartas (organizadas) com texturas](img/cartas-organizadas-avanços-3.png)
 
 ## Elementos
-
 ![Cartas (desorganizadas) com texturas](img/cartas-desorganizadas-avanços-3.png)
 
 ## Diálogos ("frontend")
-
 ![Diálogo exemplo](img/diálogo-ini-avanços-3.png)
-![Respostas exemplo](img/diálogo-opc-avanços-3.png)
+
+## Diálogos ("frontend")
+![Opções exemplo](img/diálogo-opc-avanços-3.png)
+
+## Diálogos ("frontend")
+![Respostas exemplo](img/diálogo-rsp-avanços-3.png)
 
 ## Diálogos (interpretador)
 
@@ -29,6 +30,7 @@ Fizemos um tokenizador que consegue separar o markdown nos lexemas relevantes.
 
 
 # Demonstração
+
 
 # Específicos
 
