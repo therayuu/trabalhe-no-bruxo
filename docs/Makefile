@@ -1,7 +1,11 @@
 defaults = ./config/defaults.yaml
 header   = ./config/header.tex
 
-avanços: Avanços-2.pdf Avanços-3.pdf Avanços-4.pdf
+avanços: Avanços-2.pdf \
+         Avanços-3.pdf \
+         Avanços-4.pdf \
+         Avanços-5.pdf \
+         P6.pdf
 
 all: Apresentação.pdf avanços
 
@@ -16,3 +20,5 @@ Apresentação.pdf: Apresentação.md $(defaults) $(header)
 	    --defaults=$(defaults) \
 	    --include-in-header=$(header) \
 	    #--slide-level=1
+
+.PHONY: all avanços
