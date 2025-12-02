@@ -5,66 +5,62 @@
 
 #define TAM_FONTE 20
 
+
+//! essas são as estruturas de dados erradas, a gente quer uma árvore
+////! uma lista ligada com um uma sub lista ligada não faz muito sentido e
+////! complica as coisas
+////! deveria ser algo como { nome:str, texto:str, prox:NullTerminatedList<{opção, ptr}, cap=5> }
 typedef struct dialog_node DialogueNode;
+typedef struct dialog_option DialogueOption;
 
-typedef struct dialog_option {
+struct dialog_option {
     char* text;
-    DialogueNode* nextNode;   //ponteiro para o próximo dialogo
-} DialogueOption;
-
-struct dialog_node {
-    char* speaker;
-    char* text;
-    size_t num_opts;
-    DialogueOption options[5];  //! tamanho hardcoded  
-    DialogueNode* next;
-   
+    DialogueNode* nextNode; //ponteiro para o próximo dialogo
 };
 
-TTF_Font* font;
+struct dialog_node {
+    const char* speaker;
+    const char* text;
+    size_t num_opts;
+    DialogueOption options[5]; //! tamanho hardcoded
+    DialogueNode* next;
+};
 
 static struct estado_dialogo {
-    DialogueNode* head;        // início da lista
-    DialogueNode* current;     // nó atual
-    bool waiting_for_choice;   //! esse campo não deveria existir
+    DialogueNode* head;      // início da lista
+    DialogueNode* current;   // nó atual
+    bool waiting_for_choice; //! esse campo não deveria existir
     size_t selected_option;
+
+    TTF_Font* font;
 } dialogo;
 
 
-
-DialogueNode* createNode(const char* speaker, const char* text)
-{
+//! seria mais simples usar aquela lista estática e só incrementar um
+////! contador com o número de elementos ocupados (não precisaria de free)
+DialogueNode* createNode(const char* speaker, const char* text) {
     DialogueNode* n = malloc(sizeof(DialogueNode));
-    n->speaker = (char*)speaker;
-    n->text = (char*)text;
+    n->speaker  = speaker;
+    n->text     = text;
     n->num_opts = 0;
-    n->next = NULL;
+    n->next     = NULL;
+
     return n;
 }
 
-
-
-void loadDialogue()
-  // Exemplo simples de estrutura de diálogo
-{
-    // Criar nós
-    DialogueNode* n1 = createNode(
-        "Alice",
+void loadDialogue() {
+    DialogueNode* n1 = createNode("Alice",
         "Oi! Voce "/*"ê"*/"quer ir ao parque hoje?"
     );
-
-    DialogueNode* n2 = createNode(
-        "Alice",
+    DialogueNode* n2 = createNode("Alice",
         /*"Ó"*/"Otimo! O dia esta " /*"á"*/ "lindo la " /*"á"*/ "fora."
     );
-
-    DialogueNode* n3 = createNode(
-        "Alice",
+    DialogueNode* n3 = createNode("Alice",
         "Tudo bem, talvez outro dia."
     );
 
     // Construir lista encadeada linear
-    n1->next = n2;   // caso escolha 0
+    n1->next = n2; // caso escolha 0 //! (não existe esse caso)
 
     // Adicionar opções
     n1->options[n1->num_opts++] = (DialogueOption){ "Sim, vamos!", n2 };
@@ -75,7 +71,13 @@ void loadDialogue()
     dialogo.current = n1;
 }
 
-
+void freeDialogueList(DialogueNode* head) {
+    while (head) {
+        DialogueNode* next = head->next;
+        free(head);
+        head = next;
+    }
+}
 
 void renderText(SDL_Renderer* ren, TTF_Font* font, const char* text, int x, int y) {
     SDL_Color white = {255, 255, 255, 255};
@@ -86,7 +88,6 @@ void renderText(SDL_Renderer* ren, TTF_Font* font, const char* text, int x, int 
     SDL_FreeSurface(surf);
     SDL_DestroyTexture(tex);
 }
-
 
 void renderDialog(SDL_Renderer* ren, TTF_Font* font) {
     DialogueNode* node = dialogo.current;
@@ -117,91 +118,66 @@ void renderDialog(SDL_Renderer* ren, TTF_Font* font) {
 }
 
 
-
 void dialogo_setup(SDL_Renderer* ren) {
-    (void)ren;
-
-    dialogo.waiting_for_choice = false;
-    dialogo.selected_option = 0;
+    UNUSED(ren);
 
     TTF_Init();
-    font = TTF_OpenFont(ASSETS"tiny.ttf", TAM_FONTE);
+
+    dialogo.font = TTF_OpenFont(ASSETS"tiny.ttf", TAM_FONTE);
+    dialogo.waiting_for_choice = false;
+    dialogo.selected_option = 0;
 
     loadDialogue();
 }
 
-
-
 enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
-    DialogueNode* node = dialogo.current;
-    enum tela prox_tela = DIALOGO;
+    const DialogueNode* node = dialogo.current;
+
     switch (evt.type) {
+      case SDL_KEYDOWN: switch (evt.key.keysym.sym) {
+          case SDLK_ESCAPE: return MENU;
 
-      case SDL_KEYDOWN:
-          switch (evt.key.keysym.sym) {
-
-              case SDLK_ESCAPE:
-                  prox_tela = MENU; break;
-
-              case SDLK_SPACE:
-              case SDLK_RETURN:
-              {
-                  if (dialogo.waiting_for_choice) {
-                      if (dialogo.selected_option < node->num_opts) {
-                          dialogo.current = node->options[dialogo.selected_option].nextNode;
-                          dialogo.waiting_for_choice = false;
-                      }
-                  } else {
-                      if (node->num_opts > 0) {
-                          dialogo.waiting_for_choice = true;
-                      } else if (node->next) {
-                          dialogo.current = node->next;
-                      }
+          case SDLK_SPACE: case SDLK_RETURN: {
+              if (dialogo.waiting_for_choice) {
+                  if (dialogo.selected_option < node->num_opts) {
+                      dialogo.current = node->options[dialogo.selected_option].nextNode;
+                      dialogo.waiting_for_choice = false;
+                  }
+              } else {
+                  if (node->num_opts > 0) {
+                      dialogo.waiting_for_choice = true;
+                  } else if (node->next) {
+                      dialogo.current = node->next;
                   }
               }
-              break;
+          } break;
 
-	       //! puxar lógica do menu
-              case SDLK_UP:
-                  if (dialogo.waiting_for_choice)
-                      dialogo.selected_option =
-                          (dialogo.selected_option - 1 + node->num_opts) % node->num_opts;
-              break;
+          //! puxar lógica do menu
+          case SDLK_UP: if (dialogo.waiting_for_choice) {
+              dialogo.selected_option = (dialogo.selected_option - 1 + node->num_opts) % node->num_opts;
+          } break;
 
-              case SDLK_DOWN:
-                  if (dialogo.waiting_for_choice)
-                      dialogo.selected_option =
-                          (dialogo.selected_option + 1) % node->num_opts;
-              break;
-          }
-      break;
+          //! puxar lógica do menu
+          case SDLK_DOWN: if (dialogo.waiting_for_choice) {
+              dialogo.selected_option = (dialogo.selected_option + 1) % node->num_opts;
+          } break;
+      } break;
 
-      case SDL_USEREVENT:
-          if (evt.user.code == AUX_TIMEOUTEVENT) {
+      case SDL_USEREVENT: switch (evt.user.code) {
+          case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, PRETO);
-              renderDialog(ren, font);
+              renderDialog(ren, dialogo.font);
               SDL_RenderPresent(ren);
-          }
-      break;
+          } break;
+      } break;
     }
 
-    return prox_tela;
-}
-
-
-
-void freeDialogueList(DialogueNode* head)
-{
-    while (head) {
-        DialogueNode* next = head->next;
-        free(head);
-        head = next;
-    }
+    return DIALOGO;
 }
 
 void dialogo_free() {
     freeDialogueList(dialogo.head);
 
-    TTF_CloseFont(font);
+    TTF_CloseFont(dialogo.font);
     TTF_Quit();
 }
