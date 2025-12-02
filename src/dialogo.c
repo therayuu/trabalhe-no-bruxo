@@ -95,11 +95,8 @@ void renderDialog(SDL_Renderer* ren, TTF_Font* font) {
     SDL_Rect nameBox = {TAM_FONTE*2, W_WIDTH/2, 10*TAM_FONTE, TAM_FONTE*2 + TAM_FONTE/2};
     SDL_Rect textBox = {TAM_FONTE*2, nameBox.y + nameBox.h, W_WIDTH - (TAM_FONTE*4), TAM_FONTE*6};
 
-    SDL_SetRenderDrawColor(ren, 50, 50, 50, 255);
-    SDL_RenderFillRect(ren, &textBox);
-
-    SDL_SetRenderDrawColor(ren, 80, 80, 80, 255);
-    SDL_RenderFillRect(ren, &nameBox);
+    SDL_SetRenderDrawColor(ren, 50, 50, 50, 255); SDL_RenderFillRect(ren, &textBox);
+    SDL_SetRenderDrawColor(ren, 80, 80, 80, 255); SDL_RenderFillRect(ren, &nameBox);
 
     renderText(ren, font, node->speaker, nameBox.x + 10, nameBox.y + 10);
     renderText(ren, font, node->text,    textBox.x + 10, textBox.y + 10);
