@@ -6,77 +6,69 @@
 #define TAM_FONTE 20
 
 
-//! essas são as estruturas de dados erradas, a gente quer uma árvore
-////! uma lista ligada com um uma sub lista ligada não faz muito sentido e
-////! complica as coisas
-////! deveria ser algo como { nome:str, texto:str, prox:NullTerminatedList<{opção, ptr}, cap=5> }
-typedef struct dialog_node DialogueNode;
 typedef struct dialog_option DialogueOption;
+typedef struct dialog_node   DialogueNode;
 
 struct dialog_option {
-    char* text;
-    DialogueNode* nextNode; //ponteiro para o próximo dialogo
+    const char* text;
+    DialogueNode* next;
 };
 
 struct dialog_node {
     const char* speaker;
     const char* text;
+
     size_t num_opts;
-    DialogueOption options[5]; //! tamanho hardcoded
-    DialogueNode* next;
+    union {
+        DialogueNode* next;
+        DialogueOption options[5]; //! tamanho hardcoded
+    };
 };
 
 static struct estado_dialogo {
-    DialogueNode* head;      // início da lista
-    DialogueNode* current;   // nó atual
-    bool waiting_for_choice; //! esse campo não deveria existir
+    size_t count;
+    DialogueNode arvore[300];
+
     size_t selected_option;
+    DialogueNode* current;
+    bool waiting_for_choice; //! esse campo não deveria existir
 
     TTF_Font* font;
 } dialogo;
 
 
-//! seria mais simples usar aquela lista estática e só incrementar um
-////! contador com o número de elementos ocupados (não precisaria de free)
-DialogueNode* createNode(const char* speaker, const char* text) {
-    DialogueNode* n = malloc(sizeof(DialogueNode));
-    n->speaker  = speaker;
-    n->text     = text;
-    n->num_opts = 0;
-    n->next     = NULL;
+void* fillNode(DialogueNode* n, const char* speaker, const char* text) {
+    memset(n, 0, sizeof(*n));
+    n->speaker = speaker;
+    n->text    = text;
 
     return n;
 }
 
-void loadDialogue() {
-    DialogueNode* n1 = createNode("Alice",
-        "Oi! Voce "/*"ê"*/"quer ir ao parque hoje?"
-    );
-    DialogueNode* n2 = createNode("Alice",
-        /*"Ó"*/"Otimo! O dia esta " /*"á"*/ "lindo la " /*"á"*/ "fora."
-    );
-    DialogueNode* n3 = createNode("Alice",
-        "Tudo bem, talvez outro dia."
-    );
-
-    // Construir lista encadeada linear
-    n1->next = n2; // caso escolha 0 //! (não existe esse caso)
-
-    // Adicionar opções
-    n1->options[n1->num_opts++] = (DialogueOption){ "Sim, vamos!", n2 };
-    n1->options[n1->num_opts++] = (DialogueOption){ "Nao, estou cansado.", n3 };
-
-    // HEAD da lista
-    dialogo.head = n1;
-    dialogo.current = n1;
+DialogueNode* newNode() {
+    assert(dialogo.count < LEN(dialogo.arvore));
+    return &dialogo.arvore[dialogo.count++];
 }
 
-void freeDialogueList(DialogueNode* head) {
-    while (head) {
-        DialogueNode* next = head->next;
-        free(head);
-        head = next;
-    }
+DialogueNode* createNode(const char* speaker, const char* text) {
+    return fillNode(newNode(), speaker, text);
+}
+
+void addOption(DialogueNode* n, const char* text, DialogueNode* next) {
+    assert(n->num_opts < LEN(n->options));
+    size_t idx = n->num_opts++;
+    n->options[idx].text = text;
+    n->options[idx].next = next;
+}
+
+void loadDialogue() {
+    DialogueNode *n1, *n2, *n3;
+    n1 = createNode("Alice", "Oi! Voce quer ir ao parque hoje?"); //! acentuação
+    n2 = createNode("Alice", "Otimo! O dia esta lindo la fora."); //! acentuação
+    n3 = createNode("Alice", "Tudo bem, talvez outro dia."); //! acentuação
+
+    addOption(n1, "Sim, vamos!", n2);
+    addOption(n1, "Nao, estou cansado.", n3); //! acentuação
 }
 
 void renderText(SDL_Renderer* ren, TTF_Font* font, const char* text, int x, int y) {
@@ -121,8 +113,10 @@ void dialogo_setup(SDL_Renderer* ren) {
     TTF_Init();
 
     dialogo.font = TTF_OpenFont(ASSETS"tiny.ttf", TAM_FONTE);
+    dialogo.current = &dialogo.arvore[0];
     dialogo.waiting_for_choice = false;
     dialogo.selected_option = 0;
+    dialogo.count = 0;
 
     loadDialogue();
 }
@@ -137,7 +131,7 @@ enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
           case SDLK_SPACE: case SDLK_RETURN: {
               if (dialogo.waiting_for_choice) {
                   if (dialogo.selected_option < node->num_opts) {
-                      dialogo.current = node->options[dialogo.selected_option].nextNode;
+                      dialogo.current = node->options[dialogo.selected_option].next;
                       dialogo.waiting_for_choice = false;
                   }
               } else {
@@ -173,7 +167,7 @@ enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
 }
 
 void dialogo_free() {
-    freeDialogueList(dialogo.head);
+    dialogo.count = 0;
 
     TTF_CloseFont(dialogo.font);
     TTF_Quit();
