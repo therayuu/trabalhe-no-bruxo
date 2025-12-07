@@ -32,9 +32,9 @@ static struct estado_dialogo {
     size_t count;
     DialogueNode arvore[300];
 
+    bool waiting;
     size_t opt_idx;
     DialogueNode* current;
-    bool waiting_for_choice; //! esse campo não deveria existir
 
     TTF_Font* font;
 } dialogo;
@@ -97,7 +97,7 @@ void renderDialog(SDL_Renderer* ren, TTF_Font* font) {
     renderText(ren, font, node->speaker, name.x + 10, name.y + 10);
     renderText(ren, font, node->text,    text.x + 10, text.y + 10);
 
-    if (dialogo.waiting_for_choice) {
+    if (dialogo.waiting) {
         for (size_t i = 0; i < node->num_opts; ++i) {
             const char* prefix = (i == dialogo.opt_idx ? "> " : "  ");
             renderText(ren, font, prefix,
@@ -118,7 +118,7 @@ void dialogo_setup(SDL_Renderer* ren) {
 
     dialogo.font = TTF_OpenFont(ASSETS"tiny.ttf", TAM_FONTE);
     dialogo.current = &dialogo.arvore[0];
-    dialogo.waiting_for_choice = false;
+    dialogo.waiting = false;
     dialogo.opt_idx = 0;
     dialogo.count = 0;
 
@@ -133,27 +133,24 @@ enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
           case SDLK_ESCAPE: return MENU;
 
           case SDLK_SPACE: case SDLK_RETURN: {
-              if (dialogo.waiting_for_choice) {
-                  if (dialogo.opt_idx < node->num_opts) {
-                      dialogo.current = node->options[dialogo.opt_idx].next;
-                      dialogo.waiting_for_choice = false;
-                  }
-              } else {
-                  if (node->num_opts > 0) {
-                      dialogo.waiting_for_choice = true;
-                  } else if (node->next) {
-                      dialogo.current = node->next;
-                  }
+              assert(node->num_opts == 0 || dialogo.opt_idx < node->num_opts);
+
+              if (node->num_opts > 0) {
+                  if (!dialogo.waiting) dialogo.waiting = true;
+                  else dialogo.current = node->options[dialogo.opt_idx].next;
+              } else if (node->next) {
+                  dialogo.current = node->next;
+                  dialogo.waiting = false;
               }
+
+              dialogo.opt_idx = 0;
           } break;
 
           //! puxar lógica do menu
-          case SDLK_UP: if (dialogo.waiting_for_choice) {
+          case SDLK_UP: if (node->num_opts > 0) {
               dialogo.opt_idx = (dialogo.opt_idx - 1 + node->num_opts) % node->num_opts;
           } break;
-
-          //! puxar lógica do menu
-          case SDLK_DOWN: if (dialogo.waiting_for_choice) {
+          case SDLK_DOWN: if (node->num_opts > 0) {
               dialogo.opt_idx = (dialogo.opt_idx + 1) % node->num_opts;
           } break;
       } break;
