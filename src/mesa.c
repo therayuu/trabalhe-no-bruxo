@@ -82,25 +82,25 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
               sep = rw+pad, hmid = (W_HEIGHT-rh)/2;
     static struct carta cartas[] = {
         {
-            .drag = { .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 0,
+            .drag={ .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
         }, {
-            .drag = { .r.x = sep*1, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 1,
+            .drag={ .r.x = sep*1, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=1,
         }, {
-            .drag = { .r.x = sep*2, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 2,
+            .drag={ .r.x = sep*2, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=2,
         }, {
-            .drag = { .r.x = sep*3, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 3,
+            .drag={ .r.x = sep*3, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=3,
         }, {
-            .drag = { .r.x = sep*4, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 4,
+            .drag={ .r.x = sep*4, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=4,
         }, {
-            .drag = { .r.x = sep*5, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 4,
+            .drag={ .r.x = sep*5, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=4,
         }, {
-            .drag = { .r.x = sep*6, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 3,
+            .drag={ .r.x = sep*6, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=3,
         }, {
-            .drag = { .r.x = sep*7, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 2,
+            .drag={ .r.x = sep*7, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=2,
         }, {
-            .drag = { .r.x = sep*8, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 1,
+            .drag={ .r.x = sep*8, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=1,
         }, {
-            .drag = { .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo = 0,
+            .drag={ .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
         },
     };
 
