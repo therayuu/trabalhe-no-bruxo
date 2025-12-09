@@ -1,7 +1,7 @@
 LIBS = $(wildcard lib/*.h) $(wildcard lib/*.c)
 CORE = $(wildcard *.c)
 
-CFLAGS = -Wall -Wextra --std=c23 -I lib/
+CFLAGS = -Wall -Wextra -Wpedantic --std=c23 -I lib/
 LFLAGS = -lm -lSDL2 -lSDL2_ttf -lSDL2_image
 
 ifneq ($(shell command -v pkg-config;),)
