@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -189,6 +190,17 @@ void AUX_RenderTexture(SDL_Renderer* ren, const AUX_Texture tex,
 }
 
 /* TEXTO */
+void AUX_DrawTextTTF(SDL_Renderer* ren, TTF_Font* font, const char* text, int x, int y) {
+    SDL_Surface* surf = TTF_RenderText_Blended(font, text, BRANCO);
+    SDL_Texture* tex  = SDL_CreateTextureFromSurface(ren, surf);
+
+    SDL_Rect dst = {x, y, surf->w, surf->h};
+    SDL_RenderCopy(ren, tex, NULL, &dst);
+
+    SDL_FreeSurface(surf);
+    SDL_DestroyTexture(tex);
+}
+
 void AUX_DrawRectAt(SDL_Renderer* ren,
                     SDL_Rect ret, const int x, const int y) {
     ret.x += x; ret.y += y;
