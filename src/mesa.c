@@ -85,15 +85,18 @@ if (j == i) continue;
 SDL_Rect r2 = cartas[j].drag.r;
 
  if (cartas[i].tipo != cartas[j].tipo && SDL_HasIntersection(&r1, &r2)) {
- cartas[i].tipo = CARTA_FUNDIDA;
+cartas[j].drag.r.w = 0;
+cartas[j].drag.r.h = 0;
+cartas[j].drag.r.x = -10000; 
+cartas[i].tipo = CARTA_FUNDIDA;
 }
 }
 }
 
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
-     const int rw = W_WIDTH/10, rh = rw*3/2,
+      const int rw = W_WIDTH/10, rh = rw*3/2,
               sep = rw+pad, hmid = (W_HEIGHT-rh)/2;
-     static struct carta cartas[] = {
+      static struct carta cartas[] = {
         {
             .drag={ .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
         }, {
