@@ -12,6 +12,7 @@ enum tipo_carta {
     CARTA_AGUA,
     CARTA_TERRA,
     CARTA_AR,
+    CARTA_FUNDIDA,
 
     NUM_TIPOS_CARTA,
 };
@@ -77,10 +78,22 @@ void mesa_setup(SDL_Renderer* ren) {
     }
 }
 
+static void realizar_fusao(struct carta* cartas, size_t i, size_t len) {
+SDL_Rect r1 = cartas[i].drag.r;
+for (size_t j = 0; j < len; j ++) {
+if (j == i) continue;
+SDL_Rect r2 = cartas[j].drag.r;
+
+ if (cartas[i].tipo != cartas[j].tipo && SDL_HasIntersection(&r1, &r2)) {
+ cartas[i].tipo = CARTA_FUNDIDA;
+}
+}
+}
+
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
-    const int rw = W_WIDTH/10, rh = rw*3/2,
+     const int rw = W_WIDTH/10, rh = rw*3/2,
               sep = rw+pad, hmid = (W_HEIGHT-rh)/2;
-    static struct carta cartas[] = {
+     static struct carta cartas[] = {
         {
             .drag={ .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
         }, {
@@ -128,7 +141,11 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     }
 
     for (size_t i = LEN(cartas); i--; ) {
+	DragDropState antes = cartas[i].drag.state;
         AUX_DragDropCancel(&cartas[i].drag, evt);
+	if (antes == DRAGGING && cartas[i].drag.state == UNCLICKED) {
+		realizar_fusao(cartas, i, LEN(cartas));
+	}
         if (cartas[i].drag.state != UNCLICKED) {
             AUX_ToEnd(cartas, i); break;
         }
@@ -139,4 +156,5 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 void mesa_free() {
     mesa.init = false;
 }
+
 
