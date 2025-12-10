@@ -73,7 +73,10 @@
 [Pedro]  Aí, cê vai me atender ou vai ficar aí pensando na morte da bezerra?
 [Medeia] Ah desculpa sen-- Pedro?!
 [Pedro]  Eu te conheço, menina?
-[Medeia] A gente estudou junto, seu abusado!
+[Medeia]
+        >Não, acho que deve ter sido engano...
+        >A gente estudou junto, seu abusado!
+
 [Pedro]  Ah... Pera, Medeia?!
 
 [Medeia]
@@ -116,8 +119,12 @@ Pedro]
 
 [Medeia]
     - (E lá está. Agora sim é o Pedro que eu conheço.)
-    - Você já pensou em só pagar por uma cirurgia que nem os outros?
-[Pedro] Tá maluca?? Não nasci herdeiro, não!
+    > Você já pensou em só pagar por uma cirurgia que nem os outros?
+    > Sinto muito, não posso te ajudar com isso.
+    > Tudo bem! Aceitamos o seu caso.
+[Pedro]
+    {Para a opção 1} Tá maluca?? Não nasci herdeiro, não!
+    {Para a opção 2} Não foi isso que a placa de vocês disse! Pô Medea, me ajuda ai.
 
 [Medeia]
     - Ok. Me descreve exatamente as coisas que você precisa que mudem.
