@@ -156,7 +156,11 @@ Pedro]
     - (Consegui! Eu decifrei minha primeira receita!! Agora é só juntar os elementos...)
     > Medeia junta os elementos conquistados.
     - (Pronto. Agora é torcer pra dar certo...)
-
+    (Medeia volta ao balcão)
+    [Medeia]
+    -Agora é só ter certeza que eu vou entregar o elemento certo.
+    >Entregar a poção
+    >Entregar uma mistura falsa
 
 # final-bom
 
