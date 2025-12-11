@@ -7,7 +7,7 @@
     - Porém, nos dias de hoje, a visão das pessoas sobre a magia mudou radicalmente.
     - A história da bruxaria foi distorcida e apagada por homens covardes.
     - Eles temiam o poder da magia ancestral e perseguiam aqueles que tinham conhecimento e domínio sobre ela.
-    - Existem dois tipos de opinião sobre bruxas atualmente] ou elas não existem, ou elas são malignas.
+    - Existem dois tipos de opinião sobre bruxas atualmente: ou elas não existem, ou elas são malignas.
     - Mas eu sou a prova viva de que nenhum dos dois casos está certo.
 
     - Meu nome é Medéia e eu sou uma bruxa mirim. Bem, ainda não. Mas eu estou no caminho certo!
@@ -74,8 +74,8 @@
 [Medeia] Ah desculpa sen-- Pedro?!
 [Pedro]  Eu te conheço, menina?
 [Medeia]
-        >Não, acho que deve ter sido engano...
-        >A gente estudou junto, seu abusado!
+        > Não, acho que deve ter sido engano...
+        > A gente estudou junto, seu abusado!
 
 [Pedro]  Ah... Pera, Medeia?!
 
@@ -119,13 +119,21 @@ Pedro]
 
 [Medeia]
     - (E lá está. Agora sim é o Pedro que eu conheço.)
-    > Você já pensou em só pagar por uma cirurgia que nem os outros?
-    > Sinto muito, não posso te ajudar com isso.
-    > Tudo bem! Aceitamos o seu caso.
-[Pedro]
-    {Para a opção 1} Tá maluca?? Não nasci herdeiro, não!
-    {Para a opção 2} Não foi isso que a placa de vocês disse! Pô Medea, me ajuda ai.
+    > [Você já pensou em só pagar por uma cirurgia que nem os outros?](pedro-1)
+    > [Sinto muito, não posso te ajudar com isso.](pedro-2)
+    > [Tudo bem! Aceitamos o seu caso.](pedro-3)
 
+# pedro-1
+[Pedro] Tá maluca?? Não nasci herdeiro, não!
+
+[](pedro-3)
+
+# pedro-2
+[Pedro] Não foi isso que a placa de vocês disse! Pô Medea, me ajuda ai.
+
+[](pedro-3)
+
+# pedro-3
 [Medeia]
     - Ok. Me descreve exatamente as coisas que você precisa que mudem.
 [Pedro]
@@ -135,7 +143,7 @@ Pedro]
 
 [Medeia] Mais alguma coisa?
 [Pedro]  Você tem uma saia?
-[Medeia] Se vira! Isso aqui não é um brecho, não!
+[Medeia] Se vira! Isso aqui não é um brechó, não!
 [Pedro]  Não é?
 
 [Medeia]
@@ -157,10 +165,10 @@ Pedro]
     > Medeia junta os elementos conquistados.
     - (Pronto. Agora é torcer pra dar certo...)
     (Medeia volta ao balcão)
-    [Medeia]
-    -Agora é só ter certeza que eu vou entregar o elemento certo.
-    >Entregar a poção
-    >Entregar uma mistura falsa
+[Medeia]
+    - Agora é só ter certeza que eu vou entregar o elemento certo.
+    > Entregar a poção
+    > Entregar uma mistura falsa
 
 # final-bom
 
@@ -188,7 +196,7 @@ Pedro]
     - Certo. Você tem certeza de que isso vai funcionar?
 [Medeia]
     - É claro que vai!
-    (Estou com um mal pressentimento sobre isso...)
+    - (Estou com um mau pressentimento sobre isso...)
 [Pedro]
     - Tô confiando em você, ein!
     - Vou indo embora, não quero me atrasar pro encontro.
