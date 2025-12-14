@@ -64,6 +64,34 @@ void desenhar_carta(SDL_Renderer* ren, const struct carta carta) {
     else         AUX_RenderTexture(ren, tex, &quad);
 }
 
+enum tipo_carta fundir(const enum tipo_carta t1, const enum tipo_carta t2) {
+    switch (par(t1, t2)) {
+        case par(CARTA_FOGO, CARTA_AGUA): return CARTA_AR; //!
+        case par(CARTA_TERRA, CARTA_AR):  return CARTA_FUNDIDA; //!
+
+        default: return CARTA_NADA;
+    }
+}
+
+//! inline, sempre com i=len-1 e indo do penúltimo pra trás
+void tentar_fusao(struct carta cartas[], size_t* len, const size_t idx) {
+    for (size_t i = *len; i--;) {
+        if (i == idx) continue;
+
+        if (SDL_HasIntersection(&cartas[idx].drag.r, &cartas[i].drag.r)) {
+            const enum tipo_carta t = fundir(curr->tipo, next->tipo);
+            if (t == CARTA_NADA) continue;
+
+            cartas[idx].tipo = t;
+            cartas[idx].drag.r.x = (curr->drag.r.x + next->drag.r.x)/2;
+            cartas[idx].drag.r.y = (curr->drag.r.y + next->drag.r.y)/2;
+
+            AUX_RemoveUnordered(cartas, *len, i);
+            break;
+        }
+    }
+}
+
 
 struct estado_mesa {
     bool init;
@@ -78,40 +106,10 @@ void mesa_setup(SDL_Renderer* ren) {
     }
 }
 
-enum tipo_carta fundir(const enum tipo_carta t1, const enum tipo_carta t2) {
-    switch (par(t1, t2)) {
-        case par(CARTA_FOGO, CARTA_AGUA): return CARTA_AR; //!
-        case par(CARTA_TERRA, CARTA_AR):  return CARTA_FUNDIDA; //!
-
-        default: return CARTA_NADA;
-    }
-}
-
-//! inline, sempre com i=len-1 e indo do penúltimo pra trás
-void tentar_fusao(struct carta cartas[], const size_t len, const size_t idx) {
-    struct carta* curr = &cartas[idx];
-    for (size_t i = 0; i < len; i++) {
-        if (i == idx) continue;
-
-        struct carta* next = &cartas[i];
-        if (SDL_HasIntersection(&curr->drag.r, &next->drag.r)) {
-            const enum tipo_carta t = fundir(curr->tipo, next->tipo);
-            if (t == CARTA_NADA) continue;
-
-            //! ToEnd e mudar num_cartas em vez disso
-            next->drag.r.w = 0;
-            next->drag.r.h = 0;
-            next->drag.r.x = -10000;
-            curr->tipo = t;
-            break;
-        }
-    }
-}
-
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
-      const int rw = W_WIDTH/10, rh = rw*3/2,
+    const int rw = W_WIDTH/10, rh = rw*3/2,
               sep = rw+pad, hmid = (W_HEIGHT-rh)/2;
-      static struct carta cartas[] = {
+    static struct carta cartas[] = {
         {
             .drag={ .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
         }, {
@@ -134,6 +132,7 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
             .drag={ .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
         },
     };
+    static size_t num_cartas = LEN(cartas);
 
     enum tela prox_tela = MESA;
     switch (evt.type) {
@@ -143,14 +142,13 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 
       case SDL_USEREVENT: switch (evt.user.code) {
           case AUX_SURECLICKEVENT: {
-              cartas[LEN(cartas)-1].cliques += 1;
+              cartas[num_cartas-1].cliques += 1;
           } break;
 
           case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, BRANCO);
-              for (size_t i = 0; i < LEN(cartas); i++) {
-                  const struct carta carta = cartas[i];
-                  desenhar_carta(ren, carta);
+              for (size_t i = 0; i < num_cartas; i++) {
+                  desenhar_carta(ren, cartas[i]);
               }
 
               SDL_RenderPresent(ren);
@@ -158,14 +156,14 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
       }
     }
 
-    for (size_t i = LEN(cartas); i--; ) {
+    for (size_t i = num_cartas; i--; ) {
         AUX_DragDropCancel(&cartas[i].drag, evt);
         if (cartas[i].drag.state != UNCLICKED) {
-            AUX_ToEnd(cartas, i); break;
+            AUX_ToEndLen(cartas, num_cartas, i); break;
         }
     }
-    if (cartas[LEN(cartas)-1].drag.state != DRAGGING) {
-        tentar_fusao(cartas, LEN(cartas), LEN(cartas)-1);
+    if (cartas[num_cartas-1].drag.state != DRAGGING) {
+        tentar_fusao(cartas, &num_cartas, num_cartas-1);
     }
 
     return prox_tela;

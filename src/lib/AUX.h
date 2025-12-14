@@ -132,6 +132,10 @@ void AUX_ToEndSzLen(void* arr, size_t size, size_t len, size_t idx) {
   #undef elem
 }
 
+#define AUX_RemoveUnordered(arr, len, i) do { \
+    AUX_ToEndLen(arr, len, i); len -= 1; \
+} while(0)
+
 
 /* GRÁFICOS */
 typedef struct {
