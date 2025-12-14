@@ -33,13 +33,16 @@ static AUX_Texture imagens_cartas[NUM_TIPOS_CARTA] = {
     [CARTA_FOGO ] = { .img_path = ASSETS"carta_fogo.png" },
     [CARTA_TERRA] = { .img_path = ASSETS"carta_terra.png" },
     [CARTA_AR   ] = { .img_path = ASSETS"carta_ar.png" },
-    [CARTA_VAPOR] = { .img_path = ASSETS"carta_ar.png" }, //!
+    [CARTA_VAPOR] = {
+        .color = &CINZA,
+        .img_path = ASSETS"carta_vapor.png"
+    },
     [CARTA_LAMA ] = {
         .color = &MARROM,
         .img_path = ASSETS"carta_lama.png",
     },
     [CARTA_SOM  ] = {
-        .color = &AZUL,
+        .color = &PRETO,
         .img_path = ASSETS"carta_som.png",
     },
 };
@@ -77,7 +80,7 @@ void desenhar_carta(SDL_Renderer* ren, const struct carta carta) {
     else         AUX_RenderTexture(ren, tex, &quad);
 }
 
-enum tipo_carta fundir(const enum tipo_carta t1, const enum tipo_carta t2) {
+enum tipo_carta combinar(const enum tipo_carta t1, const enum tipo_carta t2) {
     switch (par(t1, t2)) {
         case par(CARTA_FOGO,  CARTA_AGUA): return CARTA_VAPOR;
         case par(CARTA_TERRA, CARTA_AGUA): return CARTA_LAMA;
@@ -87,21 +90,24 @@ enum tipo_carta fundir(const enum tipo_carta t1, const enum tipo_carta t2) {
     }
 }
 
+struct carta fundir(struct carta curr, struct carta next) {
+    curr.tipo = combinar(curr.tipo, next.tipo);
+    curr.drag.r.x = (curr.drag.r.x + next.drag.r.x)/2;
+    curr.drag.r.y = (curr.drag.r.y + next.drag.r.y)/2;
+    return curr;
+}
+
 //! inline, sempre com i=len-1 e indo do penúltimo pra trás
 void tentar_fusao(struct carta cartas[], size_t* len, const size_t idx) {
     for (size_t i = *len; i--;) {
         if (i == idx) continue;
 
         if (SDL_HasIntersection(&cartas[idx].drag.r, &cartas[i].drag.r)) {
-            const enum tipo_carta t = fundir(cartas[idx].tipo, cartas[i].tipo);
-            if (t == CARTA_NADA) continue;
+            struct carta n = fundir(cartas[idx], cartas[i]);
+            if (n.tipo == CARTA_NADA) continue;
 
-            cartas[idx].tipo = t;
-            cartas[idx].drag.r.x = (cartas[idx].drag.r.x + cartas[i].drag.r.x)/2;
-            cartas[idx].drag.r.y = (cartas[idx].drag.r.y + cartas[i].drag.r.y)/2;
-
-            AUX_RemoveUnordered(cartas, *len, i);
-            break;
+            cartas[idx] = n;
+            AUX_RemoveUnordered(cartas, *len, i); break;
         }
     }
 }
