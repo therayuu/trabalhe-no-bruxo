@@ -13,6 +13,9 @@
 #define prox_diff(prev, curr) (((prev) != (curr)) ? curr : ZERO)
 #define curr_diff(prev, curr) (((prev) != (curr)) ? prev : ZERO)
 
+#define maior(prev, curr) (prev>curr ? prev : curr)
+#define menor(prev, curr) (prev<curr ? prev : curr)
+#define par(prev, curr) trans(menor(prev, curr), maior(prev, curr))
 
 enum tela {
     ZERO = 0,

@@ -13,6 +13,10 @@ enum tipo_carta {
     CARTA_TERRA,
     CARTA_AR,
 
+    CARTA_VAPOR,
+    CARTA_LAMA,
+    CARTA_SOM,
+
     NUM_TIPOS_CARTA,
 };
 
@@ -29,7 +33,20 @@ static AUX_Texture imagens_cartas[NUM_TIPOS_CARTA] = {
     [CARTA_FOGO ] = { .img_path = ASSETS"carta_fogo.png" },
     [CARTA_TERRA] = { .img_path = ASSETS"carta_terra.png" },
     [CARTA_AR   ] = { .img_path = ASSETS"carta_ar.png" },
+    [CARTA_VAPOR] = {
+        .color = &CINZA,
+        .img_path = ASSETS"carta_vapor.png"
+    },
+    [CARTA_LAMA ] = {
+        .color = &MARROM,
+        .img_path = ASSETS"carta_lama.png",
+    },
+    [CARTA_SOM  ] = {
+        .color = &PRETO,
+        .img_path = ASSETS"carta_som.png",
+    },
 };
+
 void desenhar_carta(SDL_Renderer* ren, const struct carta carta) {
     const SDL_Rect      rect = transmute(SDL_Rect, carta);
     const DragDropRect  drag = transmute(DragDropRect, carta);
@@ -61,6 +78,23 @@ void desenhar_carta(SDL_Renderer* ren, const struct carta carta) {
     AUX_Texture tex = imagens_cartas[carta.tipo];
     if (tex.img) AUX_RenderTexture(ren, tex, &rect);
     else         AUX_RenderTexture(ren, tex, &quad);
+}
+
+enum tipo_carta combinar(const enum tipo_carta t1, const enum tipo_carta t2) {
+    switch (par(t1, t2)) {
+        case par(CARTA_FOGO,  CARTA_AGUA): return CARTA_VAPOR;
+        case par(CARTA_TERRA, CARTA_AGUA): return CARTA_LAMA;
+        case par(CARTA_FOGO,  CARTA_AR):   return CARTA_SOM;
+
+        default: return CARTA_NADA;
+    }
+}
+
+struct carta fundir(struct carta curr, struct carta next) {
+    curr.tipo = combinar(curr.tipo, next.tipo);
+    curr.drag.r.x = (curr.drag.r.x + next.drag.r.x)/2;
+    curr.drag.r.y = (curr.drag.r.y + next.drag.r.y)/2;
+    return curr;
 }
 
 
@@ -103,6 +137,7 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
             .drag={ .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
         },
     };
+    static size_t num_cartas = LEN(cartas);
 
     enum tela prox_tela = MESA;
     switch (evt.type) {
@@ -112,14 +147,13 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 
       case SDL_USEREVENT: switch (evt.user.code) {
           case AUX_SURECLICKEVENT: {
-              cartas[LEN(cartas)-1].cliques += 1;
+              cartas[num_cartas-1].cliques += 1;
           } break;
 
           case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, BRANCO);
-              for (size_t i = 0; i < LEN(cartas); i++) {
-                  const struct carta carta = cartas[i];
-                  desenhar_carta(ren, carta);
+              for (size_t i = 0; i < num_cartas; i++) {
+                  desenhar_carta(ren, cartas[i]);
               }
 
               SDL_RenderPresent(ren);
@@ -127,12 +161,27 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
       }
     }
 
-    for (size_t i = LEN(cartas); i--; ) {
+    for (size_t i = num_cartas; i--; ) {
         AUX_DragDropCancel(&cartas[i].drag, evt);
         if (cartas[i].drag.state != UNCLICKED) {
-            AUX_ToEnd(cartas, i); break;
+            AUX_ToEndLen(cartas, num_cartas, i); break;
         }
     }
+
+    struct carta* last = &cartas[num_cartas-1];
+    if (last->drag.state == UNCLICKED) {
+        for (size_t i = num_cartas-1; i--;) {
+            const struct carta* curr = &cartas[i];
+
+            if (SDL_HasIntersection(&last->drag.r, &curr->drag.r)) {
+                struct carta n = fundir(*last, *curr);
+                if (n.tipo != CARTA_NADA) {
+                    *last = n; AUX_RemoveUnordered(cartas, num_cartas, i); break;
+                }
+            }
+        }
+    }
+
     return prox_tela;
 }
 
