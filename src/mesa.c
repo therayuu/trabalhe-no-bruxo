@@ -97,21 +97,6 @@ struct carta fundir(struct carta curr, struct carta next) {
     return curr;
 }
 
-//! inline, sempre com i=len-1 e indo do penúltimo pra trás
-void tentar_fusao(struct carta cartas[], size_t* len, const size_t idx) {
-    for (size_t i = *len; i--;) {
-        if (i == idx) continue;
-
-        if (SDL_HasIntersection(&cartas[idx].drag.r, &cartas[i].drag.r)) {
-            struct carta n = fundir(cartas[idx], cartas[i]);
-            if (n.tipo == CARTA_NADA) continue;
-
-            cartas[idx] = n;
-            AUX_RemoveUnordered(cartas, *len, i); break;
-        }
-    }
-}
-
 
 struct estado_mesa {
     bool init;
@@ -182,8 +167,19 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
             AUX_ToEndLen(cartas, num_cartas, i); break;
         }
     }
-    if (cartas[num_cartas-1].drag.state != DRAGGING) {
-        tentar_fusao(cartas, &num_cartas, num_cartas-1);
+
+    struct carta* last = &cartas[num_cartas-1];
+    if (last->drag.state == UNCLICKED) {
+        for (size_t i = num_cartas-1; i--;) {
+            const struct carta* curr = &cartas[i];
+
+            if (SDL_HasIntersection(&last->drag.r, &curr->drag.r)) {
+                struct carta n = fundir(*last, *curr);
+                if (n.tipo != CARTA_NADA) {
+                    *last = n; AUX_RemoveUnordered(cartas, num_cartas, i); break;
+                }
+            }
+        }
     }
 
     return prox_tela;
