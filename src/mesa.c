@@ -12,7 +12,7 @@ enum tipo_carta {
     CARTA_AGUA,
     CARTA_TERRA,
     CARTA_AR,
-    CARTA_FUNDIDA,
+    CARTA_FUNDIDA, //! não deveria existir
 
     NUM_TIPOS_CARTA,
 };
@@ -78,17 +78,32 @@ void mesa_setup(SDL_Renderer* ren) {
     }
 }
 
-static void realizar_fusao(struct carta* cartas, size_t i, size_t len) {
-    SDL_Rect r1 = cartas[i].drag.r;
-    for (size_t j = 0; j < len; j++) {
-        if (j == i) continue;
-        SDL_Rect r2 = cartas[j].drag.r;
+enum tipo_carta fundir(const enum tipo_carta t1, const enum tipo_carta t2) {
+    switch (par(t1, t2)) {
+        case par(CARTA_FOGO, CARTA_AGUA): return CARTA_AR; //!
+        case par(CARTA_TERRA, CARTA_AR):  return CARTA_FUNDIDA; //!
 
-        if (cartas[i].tipo != cartas[j].tipo && SDL_HasIntersection(&r1, &r2)) {
-            cartas[j].drag.r.w = 0;
-            cartas[j].drag.r.h = 0;
-            cartas[j].drag.r.x = -10000; 
-            cartas[i].tipo = CARTA_FUNDIDA;
+        default: return CARTA_NADA;
+    }
+}
+
+//! inline, sempre com i=len-1 e indo do penúltimo pra trás
+void tentar_fusao(struct carta cartas[], const size_t len, const size_t idx) {
+    struct carta* curr = &cartas[idx];
+    for (size_t i = 0; i < len; i++) {
+        if (i == idx) continue;
+
+        struct carta* next = &cartas[i];
+        if (SDL_HasIntersection(&curr->drag.r, &next->drag.r)) {
+            const enum tipo_carta t = fundir(curr->tipo, next->tipo);
+            if (t == CARTA_NADA) continue;
+
+            //! ToEnd e mudar num_cartas em vez disso
+            next->drag.r.w = 0;
+            next->drag.r.h = 0;
+            next->drag.r.x = -10000;
+            curr->tipo = t;
+            break;
         }
     }
 }
@@ -144,15 +159,15 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     }
 
     for (size_t i = LEN(cartas); i--; ) {
-        DragDropState antes = cartas[i].drag.state;
         AUX_DragDropCancel(&cartas[i].drag, evt);
-        if (antes == DRAGGING && cartas[i].drag.state == UNCLICKED) {
-            realizar_fusao(cartas, i, LEN(cartas));
-        }
         if (cartas[i].drag.state != UNCLICKED) {
             AUX_ToEnd(cartas, i); break;
         }
     }
+    if (cartas[LEN(cartas)-1].drag.state != DRAGGING) {
+        tentar_fusao(cartas, LEN(cartas), LEN(cartas)-1);
+    }
+
     return prox_tela;
 }
 
