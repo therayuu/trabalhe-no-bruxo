@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "lex.h"
+
 #define TAM_FONTE 20
 
 #define FUNDO_NOME  CINZA_MEDIO
@@ -29,6 +31,9 @@ struct dialog_node {
 };
 
 static struct estado_dialogo {
+    bool init;
+    struct lexer lexer;
+
     size_t count;
     DialogueNode arvore[300];
 
@@ -64,6 +69,204 @@ void node_add_option(DialogueNode* n, const char* text, DialogueNode* next) {
     n->options[idx].next = next;
 }
 
+typedef struct string_view {
+    const char* buf;
+    size_t len;
+} AUX_StringView;
+
+#define AUX_StringViewEq(a, b) (AUX_StringViewCmp(a, b) == 0)
+int AUX_StringViewCmp(AUX_StringView a, AUX_StringView b) {
+    return strncmp(a.buf, b.buf, a.len);
+}
+
+#define AUX_SV(str) ((AUX_StringView){str, strlen(str)})
+
+typedef struct {
+    AUX_StringView name;
+    DialogueNode* first;
+} Section;
+
+static struct {
+    Section buf[100]; //! tamanho fixo
+    size_t len;
+} section_table;
+
+Section* section_alloc() {
+    assert(section_table.len < LEN(section_table.buf));
+    return &section_table.buf[section_table.len++];
+}
+
+AUX_StringView curr_speaker = { .buf = NULL, .len = 0 };
+
+void parse_title(struct lexer* l) {
+    struct token_t tok;
+
+    tok = lexer_next(l); assert(tok.kind == TEXTO);
+    Section* sec = section_alloc();
+    *sec = (Section) {
+        .name = (AUX_StringView){ l->buf + tok.idx, tok.len },
+        .first = &dialogo.arvore[dialogo.count],
+    };
+    while (tok.kind != FECHA_LINHA) {
+        tok = lexer_next(l);
+        sec->name.len += tok.len;
+    };
+
+    printf("Seção: %.*s\n", (int)sec->name.len, sec->name.buf);
+}
+
+void parse_fala(struct lexer* l) {
+    struct token_t tok = lexer_next(l);
+
+    AUX_StringView str = {l->buf + tok.idx, tok.len};
+    while (tok.kind != TOK_EOF) switch (tok.kind) {
+        case ABRE_TITULO:
+        case FECHA_NOME:
+        case ABRE_PAR:  case FECHA_PAR:
+        case ABRE_COL:  case FECHA_COL:
+        case ABRE_FALA: case ABRE_OPCAO:
+        case TEXTO: {
+            tok = lexer_next(l);
+            str.len += tok.len;
+        } break;
+
+        case FECHA_LINHA: {
+          printf("- [%.*s]: %.*s\n",
+                 (int)curr_speaker.len, curr_speaker.buf,
+                 (int)str.len, str.buf);
+        } return;
+
+        case INDENTACAO: UNREACHABLE();
+        case TOK_EOF: return;
+    }
+}
+
+void parse_option(struct lexer* l) {
+    AUX_StringView prev_speaker = curr_speaker;
+
+    struct lexer prev = *l;
+    struct token_t tok = lexer_next(l);
+
+    if (tok.kind == TEXTO) {
+        *l = prev;
+        curr_speaker = AUX_SV("(Narrador)"); {
+            parse_fala(l);
+        } curr_speaker = prev_speaker;
+        return;
+    }
+
+    *l = prev;
+    tok = lexer_expect(l, ABRE_COL);
+    tok = lexer_expect(l, TEXTO);
+    AUX_StringView str = {l->buf + tok.idx, tok.len};
+    tok = lexer_expect(l, FECHA_COL);
+
+    tok = lexer_expect(l, ABRE_PAR);
+    tok = lexer_expect(l, TEXTO);
+    AUX_StringView lnk = {l->buf + tok.idx, tok.len};
+    tok = lexer_expect(l, FECHA_PAR);
+
+    lexer_expect(l, FECHA_LINHA);
+    printf("> [%.*s]: [%.*s](%.*s)\n",
+           (int)curr_speaker.len, curr_speaker.buf,
+           (int)lnk.len, lnk.buf,
+           (int)str.len, str.buf);
+}
+
+void parse_skip_or_speaker(struct lexer* l) {
+    struct lexer prev = *l;
+    struct token_t tok = lexer_next(l);
+    AUX_StringView nome = {l->buf + tok.idx, tok.len};
+    switch (tok.kind) {
+        case TEXTO: {
+            tok = lexer_expect(l, FECHA_COL);
+        } break;
+        case FECHA_COL: {
+            nome.len = 0;
+        } break;
+
+        default: {
+            lexer_trace(l, tok);
+            UNREACHABLE();
+        } break;
+    }
+
+    prev = *l;
+    tok = lexer_next(l);
+    AUX_StringView lnk;
+    switch (tok.kind) {
+        case FECHA_LINHA: {
+            curr_speaker = nome;
+            return;
+        } break;
+        case TEXTO: {
+            *l = prev;
+            curr_speaker = nome;
+            parse_fala(l);
+            return;
+        } break;
+        case ABRE_PAR: {
+            tok = lexer_expect(l, TEXTO);
+            lnk = (AUX_StringView){l->buf + tok.idx, tok.len};
+            tok = lexer_expect(l, FECHA_PAR);
+        } break;
+
+        default: {
+            lexer_trace(l, tok);
+            UNREACHABLE();
+        } break;
+    }
+    printf("[](%.*s)\n", (int)lnk.len, lnk.buf);
+}
+
+void parse_comment(struct lexer* l) {
+    struct token_t tok = lexer_expect(l, ABRE_TITULO);
+    while (tok.kind != TOK_EOF) switch (tok.kind) {
+        case ABRE_TITULO:
+        case FECHA_NOME:
+        case ABRE_PAR:  case FECHA_PAR:
+        case ABRE_COL:  case FECHA_COL:
+        case ABRE_FALA: case ABRE_OPCAO:
+        case TEXTO: {
+            tok = lexer_next(l);
+        } break;
+
+        case FECHA_LINHA: return;
+
+        case TOK_EOF:
+        case INDENTACAO: UNREACHABLE();
+    }
+}
+
+void parse_dialogue(struct lexer* l) {
+    struct token_t tok = {0};
+    while (tok.kind != TOK_EOF) {
+        tok = lexer_next(l);
+        switch (tok.kind) {
+          case ABRE_TITULO: parse_title(l);           break;
+          case ABRE_FALA:   parse_fala(l);            break;
+          case ABRE_OPCAO:  parse_option(l);          break;
+          case ABRE_COL:    parse_skip_or_speaker(l); break;
+
+          case INDENTACAO: {
+              struct lexer prev = *l;
+              tok = lexer_next(l);
+              if (tok.kind == ABRE_TITULO) {
+                  parse_comment(l);
+              } else *l = prev;
+          } break;
+
+          case FECHA_LINHA: break;
+          case TOK_EOF: return;
+
+          default: {
+              lexer_trace(l, tok);
+              UNREACHABLE();
+          } break;
+        }
+    }
+}
+
 
 void dialogo_setup(SDL_Renderer* ren) {
     UNUSED(ren);
@@ -75,6 +278,13 @@ void dialogo_setup(SDL_Renderer* ren) {
     dialogo.waiting = false;
     dialogo.opt_idx = 0;
     dialogo.count = 0;
+
+    if (!dialogo.init) {
+        lexer_init(&dialogo.lexer, ASSETS"diálogo.md");
+        parse_dialogue(&dialogo.lexer);
+    }
+
+    dialogo.init = true;
 
     //! isso é um placeholder
     DialogueNode *n1, *n2, *n3;

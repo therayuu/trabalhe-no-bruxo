@@ -13,6 +13,7 @@
 /* MACROS */
 #define LEN(arr) (sizeof(arr)/sizeof(*arr))
 #define UNUSED(x) (void) x
+#define UNREACHABLE() assert(false && "unreachable")
 
 #define as(T) *(T*)&
 #define transmute(T, x) (as(T)x)

@@ -74,8 +74,8 @@
 [Medeia] Ah desculpa sen-- Pedro?!
 [Pedro]  Eu te conheço, menina?
 [Medeia]
-        > Não, acho que deve ter sido engano...
-        > A gente estudou junto, seu abusado!
+    > Não, acho que deve ter sido engano...
+    > A gente estudou junto, seu abusado!
 
 [Pedro]  Ah... Pera, Medeia?!
 
@@ -110,30 +110,30 @@
 [Medeia]
     - (Me parece que você devia parar de chamar essas coisas de idiotice.)
     - E o que a gente tem a ver com isso?
-Pedro]
+[Pedro]
     - Eu... falei pra ele que era uma menina.
 
-    > Ele mostra a descrição de seu, está escrito] "totalmente uma garota, pode confiar rsrs"
+    > Ele mostra a descrição de seu, está escrito: "totalmente uma garota, pode confiar rsrs"
 
     - Eu preciso de alguma coisa que me faça parecer uma menina pra ele.
 
 [Medeia]
     - (E lá está. Agora sim é o Pedro que eu conheço.)
-    > [Você já pensou em só pagar por uma cirurgia que nem os outros?](pedro-1)
-    > [Sinto muito, não posso te ajudar com isso.](pedro-2)
-    > [Tudo bem! Aceitamos o seu caso.](pedro-3)
+    > [Você já pensou em só pagar por uma cirurgia que nem os outros?](pedro_1)
+    > [Sinto muito, não posso te ajudar com isso.](pedro_2)
+    > [Tudo bem! Aceitamos o seu caso.](pedro_3)
 
-# pedro-1
+# pedro_1
 [Pedro] Tá maluca?? Não nasci herdeiro, não!
 
-[](pedro-3)
+[](pedro_3)
 
-# pedro-2
+# pedro_2
 [Pedro] Não foi isso que a placa de vocês disse! Pô Medea, me ajuda ai.
 
-[](pedro-3)
+[](pedro_3)
 
-# pedro-3
+# pedro_3
 [Medeia]
     - Ok. Me descreve exatamente as coisas que você precisa que mudem.
 [Pedro]
@@ -164,18 +164,18 @@ Pedro]
     - (Consegui! Eu decifrei minha primeira receita!! Agora é só juntar os elementos...)
     > Medeia junta os elementos conquistados.
     - (Pronto. Agora é torcer pra dar certo...)
-    (Medeia volta ao balcão)
+    - (Medeia volta ao balcão)
 [Medeia]
     - Agora é só ter certeza que eu vou entregar o elemento certo.
     > Entregar a poção
     > Entregar uma mistura falsa
 
-# final-bom
+# final_bom
 
 - [nada feito ainda]
 
 
-# final-ruim
+# final_ruim
 
 > Medeia volta ao balcão.
 [Pedro]
@@ -225,11 +225,11 @@ Pedro]
     > Gabriel vê Pedro na distância e começa a andar até ele.
 [Pedro]
     - (DROGA! Ele me viu, o que eu faço?!)
-    E aí, cara... Que coincidência, haha...
+    - E aí, cara... Que coincidência, haha...
 [Gabriel]
-    _ Você não vai acreditar! Eu tô esperando a maior gata, a gente vai sair num encontro.
-    _ Conheci ela no Kinder, ela é até meio parecida com você.
-    _ Huh... Enfim! Como você tá? Sair pra passear num parquinho não é muito a sua cara.
+    - Você não vai acreditar! Eu tô esperando a maior gata, a gente vai sair num encontro.
+    - Conheci ela no Kinder, ela é até meio parecida com você.
+    - Huh... Enfim! Como você tá? Sair pra passear num parquinho não é muito a sua cara.
 [Pedro]
     - É, eu prefiro o cemitério mesmo...
 [Gabriel]
@@ -324,8 +324,8 @@ Pedro]
 [Pedro]
     - Não é isso...
     - (O que eu falo pra ele?! Será que eu conto pra ele...)
-    // Tive a ideia de colocar uma opção de diálogo aqui onde você pode se declarar ou não //
-    // Por enquanto segue com o caso onde Pedro se declara //
+    ## Tive a ideia de colocar uma opção de diálogo aqui onde você pode se declarar ou não #
+    ## Por enquanto segue com o caso onde Pedro se declara #
     - Era tudo uma brincadeira no começo, pelo menos eu achei que sim.
     - Mas depois de um tempo, as coisas ficaram diferentes.
     > Gabriel põe as mãos na cintura e começa a escutar com atenção.
@@ -383,7 +383,7 @@ Pedro]
     - Não precisa se você achar que a gente tá indo rápido demais.
 [Pedro]
     - Não! Eu quero sim.
-Gabriel]
+[Gabriel]
     - Então vem cá!
     > Os dois se aproximam envergonhados e se dão um selinho.
     > Mas no meio do beijo algo começa a mudar.
