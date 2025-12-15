@@ -52,6 +52,10 @@ void* node_fill(DialogueNode* n, const char* speaker, const char* text) {
     return n;
 }
 
+DialogueNode* node_last() {
+    return &dialogo.arvore[dialogo.count-1];
+}
+
 DialogueNode* node_alloc() {
     assert(dialogo.count < LEN(dialogo.arvore));
     return &dialogo.arvore[dialogo.count++];
@@ -80,6 +84,7 @@ int AUX_StringViewCmp(AUX_StringView a, AUX_StringView b) {
 }
 
 #define AUX_SV(str) ((AUX_StringView){str, strlen(str)})
+#define AUX_SVToCstr(str) (strncpy(malloc(str.len+1), str.buf, str.len))
 
 typedef struct {
     AUX_StringView name;
@@ -96,23 +101,40 @@ Section* section_alloc() {
     return &section_table.buf[section_table.len++];
 }
 
+Section* section_find(AUX_StringView name) {
+    for (size_t i = 0; i < LEN(section_table.buf); i++) {
+        if (AUX_StringViewEq(name, section_table.buf[i].name)) //! deve ter algo errado aqui
+            return &section_table.buf[i];
+    }
+    return NULL;
+}
+
 AUX_StringView curr_speaker = { .buf = NULL, .len = 0 };
 
 void parse_title(struct lexer* l) {
     struct token_t tok;
 
-    tok = lexer_next(l); assert(tok.kind == TEXTO);
+    tok = lexer_expect(l, TEXTO);
     Section* sec = section_alloc();
     *sec = (Section) {
         .name = (AUX_StringView){ l->buf + tok.idx, tok.len },
         .first = &dialogo.arvore[dialogo.count],
     };
+
     while (tok.kind != FECHA_LINHA) {
         tok = lexer_next(l);
         sec->name.len += tok.len;
     };
 
     printf("Seção: %.*s\n", (int)sec->name.len, sec->name.buf);
+}
+
+void skip_title(struct lexer* l) {
+    struct token_t tok = {0};
+
+    while (tok.kind != FECHA_LINHA && tok.kind != TOK_EOF) {
+        tok = lexer_next(l);
+    };
 }
 
 void parse_fala(struct lexer* l) {
@@ -131,9 +153,16 @@ void parse_fala(struct lexer* l) {
         } break;
 
         case FECHA_LINHA: {
-          printf("- [%.*s]: %.*s\n",
-                 (int)curr_speaker.len, curr_speaker.buf,
-                 (int)str.len, str.buf);
+            printf("- [%.*s]: %.*s\n",
+                   (int)curr_speaker.len, curr_speaker.buf,
+                   (int)str.len, str.buf);
+            DialogueNode* n = node_create(AUX_SVToCstr(curr_speaker),
+                                          AUX_SVToCstr(str));
+            n->next = n+1; //! errado em muitos momentos
+
+            //! isso tá cagando memória
+            ///! (SVToCstr aloca memória e a gente não tenta desduplicar nem os nomes)
+            ///! seria bom poder renderizar o texto usando string_view direto
         } return;
 
         case INDENTACAO: UNREACHABLE();
@@ -147,6 +176,7 @@ void parse_option(struct lexer* l) {
     struct lexer prev = *l;
     struct token_t tok = lexer_next(l);
 
+    //! isso provavelmente não deveria ser com o mesmo caractere inicial de opção
     if (tok.kind == TEXTO) {
         *l = prev;
         curr_speaker = AUX_SV("(Narrador)"); {
@@ -171,6 +201,8 @@ void parse_option(struct lexer* l) {
            (int)curr_speaker.len, curr_speaker.buf,
            (int)lnk.len, lnk.buf,
            (int)str.len, str.buf);
+
+    DialogueNode* n = node_last(); //! fazer o resto
 }
 
 void parse_skip_or_speaker(struct lexer* l) {
@@ -219,7 +251,7 @@ void parse_skip_or_speaker(struct lexer* l) {
     printf("[](%.*s)\n", (int)lnk.len, lnk.buf);
 }
 
-void parse_comment(struct lexer* l) {
+void skip_comment(struct lexer* l) {
     struct token_t tok = lexer_expect(l, ABRE_TITULO);
     while (tok.kind != TOK_EOF) switch (tok.kind) {
         case ABRE_TITULO:
@@ -252,7 +284,7 @@ void parse_dialogue(struct lexer* l) {
               struct lexer prev = *l;
               tok = lexer_next(l);
               if (tok.kind == ABRE_TITULO) {
-                  parse_comment(l);
+                  skip_comment(l);
               } else *l = prev;
           } break;
 
@@ -287,13 +319,13 @@ void dialogo_setup(SDL_Renderer* ren) {
     dialogo.init = true;
 
     //! isso é um placeholder
-    DialogueNode *n1, *n2, *n3;
-    n1 = node_create("Alice", "Oi! Voce quer ir ao parque hoje?"); //! acentuação
-    n2 = node_create("Alice", "Otimo! O dia esta lindo la fora."); //! acentuação
-    n3 = node_create("Alice", "Tudo bem, talvez outro dia."); //! acentuação
+    //DialogueNode *n1, *n2, *n3;
+    //n1 = node_create("Alice", "Oi! Voce quer ir ao parque hoje?"); //! acentuação
+    //n2 = node_create("Alice", "Otimo! O dia esta lindo la fora."); //! acentuação
+    //n3 = node_create("Alice", "Tudo bem, talvez outro dia."); //! acentuação
 
-    node_add_option(n1, "Sim, vamos!", n2);
-    node_add_option(n1, "Nao, estou cansado.", n3); //! acentuação
+    //node_add_option(n1, "Sim, vamos!", n2);
+    //node_add_option(n1, "Nao, estou cansado.", n3); //! acentuação
 }
 
 void dialogo_render(SDL_Renderer* ren, TTF_Font* font) {
