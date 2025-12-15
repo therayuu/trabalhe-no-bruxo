@@ -67,15 +67,17 @@
 [Teresa]
     - Vá já para a frente do balcão e comece seu dia de trabalho. Boa sorte!
 
-# caso-1
+# caso_1
 
 [Medeia] (Nossa! A Teresa parece ter ficado muito zangada...)
 [Pedro]  Aí, cê vai me atender ou vai ficar aí pensando na morte da bezerra?
 [Medeia] Ah desculpa sen-- Pedro?!
 [Pedro]  Eu te conheço, menina?
 [Medeia]
-    > Não, acho que deve ter sido engano...
-    > A gente estudou junto, seu abusado!
+    > [Não, acho que deve ter sido engano...](caso_1_1)
+    > [A gente estudou junto, seu abusado!](caso_1_1)
+
+# caso_1_1
 
 [Pedro]  Ah... Pera, Medeia?!
 
@@ -167,13 +169,14 @@
     - (Medeia volta ao balcão)
 [Medeia]
     - Agora é só ter certeza que eu vou entregar o elemento certo.
-    > Entregar a poção
-    > Entregar uma mistura falsa
+    > [Entregar a poção](final_bom)
+    > [Entregar uma mistura falsa](final_ruim)
 
 # final_bom
 
 - [nada feito ainda]
 
+[](fim)
 
 # final_ruim
 
@@ -398,4 +401,8 @@
 [Pedro]
     - (MEDEIIAAAAAAAAAAAAAAAAAAAAA-)
     - AAWOOOOOOOOOOOOOOOO!
+
+[](fim)
+
+# fim
 
