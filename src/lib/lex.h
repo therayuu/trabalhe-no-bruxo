@@ -77,7 +77,7 @@ enum token_kind {
     ABRE_TITULO = '#',
     FECHA_NOME  = ':',
     ABRE_FALA   = '-',
-    ABRE_CITACAO= '>',
+    ABRE_OPCAO  = '>',
     ABRE_COL    = '[',
     FECHA_COL   = ']',
     ABRE_PAR    = '(',
@@ -94,7 +94,7 @@ char* kind_str(enum token_kind kind) {
       case ABRE_TITULO : return "#";
       case FECHA_NOME  : return ":";
       case ABRE_FALA   : return "-";
-      case ABRE_CITACAO: return ">";
+      case ABRE_OPCAO  : return ">";
       case ABRE_COL    : return "[";
       case FECHA_COL   : return "]";
       case ABRE_PAR    : return "(";
@@ -113,6 +113,13 @@ struct token_t {
     size_t idx, len, line, col;
 };
 
+void lexer_reset(struct lexer* l) {
+    l->idx = 0;
+    l->curr = l->buf[l->idx];
+    l->next = l->buf[l->idx+1];
+    l->line = l->col = 0;
+}
+
 bool lexer_init(struct lexer* l, const char* const file) {
     FILE *f = fopen(file, "rt");
     if (!f) return false;
@@ -123,16 +130,9 @@ bool lexer_init(struct lexer* l, const char* const file) {
     char* buf = slurp_str_from_file(f, len);
     if (!buf) return false;
 
-    struct lexer init = {
-       .idx = 0,
-
-       .buf = buf, .len = len,
-       .curr = init.buf[init.idx],
-       .next = init.buf[init.idx+1],
-
-       .file_name = file,
-       .line = 0, .col = 0,
-    }; *l = init;
+    l->file_name = file;
+    l->buf = buf; l->len = len;
+    lexer_reset(l);
 
     return true;
 }
@@ -233,17 +233,42 @@ struct token_t lexer_next(struct lexer* l) {
     }
 }
 
-void lexer_fmt_token(struct lexer* lexer, char* buf, struct token_t tok) {
-    int len = tok.len;
+int lexer_fmt_token(struct lexer* lexer, char* buf, struct token_t tok) {
+    int len = tok.len, count = 0;
     if (lexer__is_simple_token(tok.kind) || tok.kind == TOK_EOF) len = 0;
 
-    buf += sprintf(buf, "%s", kind_str(tok.kind));
+    count += sprintf(buf + count, "%s", kind_str(tok.kind));
     if (len)
-        buf += sprintf(buf, "(%.*s)", len, &lexer->buf[tok.idx]);
+        count += sprintf(buf + count, "(%.*s)", len, &lexer->buf[tok.idx]);
+    return count;
 }
 
 void lexer_trace(struct lexer* lexer, struct token_t tok) {
-    //! buffer de tamanho fixo
-    static char buf[300]; lexer_fmt_token(lexer, buf, tok);
+    static char buf[300]; lexer_fmt_token(lexer, buf, tok); //! buffer de tamanho fixo
     printf("%s:%lu:%lu: %s\n", lexer->file_name, tok.line+1, tok.col+1, buf);
+}
+
+void lexer_error(struct lexer* lexer, struct token_t* tok, const char* err) {
+    size_t line = tok? tok->line: lexer->line,
+           col  = tok? tok->col:  lexer->col;
+    fprintf(stderr, "%s:%lu:%lu: error: %s\n", lexer->file_name, line+1, col+1, err);
+    abort();
+}
+
+void lexer_unexpected(struct lexer* lexer, struct token_t tok, enum token_kind kind) {
+    const char* fmt = "expected %s, found %s";
+
+    static char buf[300]; //! buffer de tamanho fixo
+    lexer_fmt_token(lexer, buf, tok);
+
+    static char err[sizeof(buf) + sizeof(fmt) + sizeof("INDENTAÇÂO")];
+    sprintf(err, fmt, kind_str(kind), buf);
+
+    lexer_error(lexer, &tok, err);
+}
+
+struct token_t lexer_expect(struct lexer* lexer, enum token_kind kind) {
+    struct token_t tok = lexer_next(lexer);
+    if (tok.kind != kind) lexer_unexpected(lexer, tok, kind);
+    return tok;
 }
