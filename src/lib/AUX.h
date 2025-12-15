@@ -114,6 +114,19 @@ void AUX_CenterRect(SDL_Rect* inner, SDL_Rect outer) {
 }
 
 /* MISCELÂNEA */
+typedef struct string_view {
+    const char* buf;
+    size_t len;
+} AUX_StringView;
+
+#define AUX_SV(str) ((AUX_StringView){str, strlen(str)})
+#define AUX_SVToCstr(str) (strncpy(calloc(str.len, 1), str.buf, str.len))
+
+#define AUX_StringViewEq(a, b) (AUX_StringViewCmp(a, b) == 0)
+int AUX_StringViewCmp(AUX_StringView a, AUX_StringView b) {
+    return strncmp(a.buf, b.buf, a.len);
+}
+
 static inline
 #define AUX_ToEnd(arr, i) AUX_ToEndLen(arr, LEN(arr), i)
 #define AUX_ToEndLen(arr, len, i) AUX_ToEndSzLen(arr, sizeof(*arr), len, i)
@@ -195,8 +208,10 @@ void AUX_RenderTexture(SDL_Renderer* ren, const AUX_Texture tex,
 }
 
 /* TEXTO */
-void AUX_DrawTextTTF(SDL_Renderer* ren, TTF_Font* font, const char* text, int x, int y) {
-    SDL_Surface* surf = TTF_RenderText_Blended(font, text, BRANCO);
+#define AUX_DrawTextTTF(ren, font, text, x, y) AUX_DrawTextTTFWrap(ren, font, text, x, y, 0)
+void AUX_DrawTextTTFWrap(SDL_Renderer* ren, TTF_Font* font, const char* text,
+                         int x, int y, uint32_t wrap) {
+    SDL_Surface* surf = TTF_RenderUTF8_Blended_Wrapped(font, text, BRANCO, wrap);
     SDL_Texture* tex  = SDL_CreateTextureFromSurface(ren, surf);
 
     SDL_Rect dst = {x, y, surf->w, surf->h};

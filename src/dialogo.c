@@ -17,6 +17,8 @@ typedef struct dialog_node   DialogueNode;
 struct dialog_option {
     const char* text;
     DialogueNode* next;
+
+    AUX_StringView sect;
 };
 
 struct dialog_node {
@@ -65,26 +67,14 @@ DialogueNode* node_create(const char* speaker, const char* text) {
     return node_fill(node_alloc(), speaker, text);
 }
 
-void node_add_option(DialogueNode* n, const char* text, DialogueNode* next) {
+void node_add_option(DialogueNode* n, const char* text, AUX_StringView sect) {
     assert(n->num_opts < LEN(n->options));
 
     size_t idx = n->num_opts++;
     n->options[idx].text = text;
-    n->options[idx].next = next;
+    n->options[idx].next = NULL;
+    n->options[idx].sect = sect;
 }
-
-typedef struct string_view {
-    const char* buf;
-    size_t len;
-} AUX_StringView;
-
-#define AUX_StringViewEq(a, b) (AUX_StringViewCmp(a, b) == 0)
-int AUX_StringViewCmp(AUX_StringView a, AUX_StringView b) {
-    return strncmp(a.buf, b.buf, a.len);
-}
-
-#define AUX_SV(str) ((AUX_StringView){str, strlen(str)})
-#define AUX_SVToCstr(str) (strncpy(malloc(str.len+1), str.buf, str.len))
 
 typedef struct {
     AUX_StringView name;
@@ -109,7 +99,7 @@ Section* section_find(AUX_StringView name) {
     return NULL;
 }
 
-AUX_StringView curr_speaker = { .buf = NULL, .len = 0 };
+AUX_StringView curr_speaker = {0};
 
 void parse_title(struct lexer* l) {
     struct token_t tok;
@@ -202,10 +192,10 @@ void parse_option(struct lexer* l) {
            (int)lnk.len, lnk.buf,
            (int)str.len, str.buf);
 
-    DialogueNode* n = node_last(); //! fazer o resto
+    node_add_option(node_last(), AUX_SVToCstr(str), lnk);
 }
 
-void parse_skip_or_speaker(struct lexer* l) {
+void parse_speaker_or_redirect(struct lexer* l) {
     struct lexer prev = *l;
     struct token_t tok = lexer_next(l);
     AUX_StringView nome = {l->buf + tok.idx, tok.len};
@@ -223,32 +213,34 @@ void parse_skip_or_speaker(struct lexer* l) {
         } break;
     }
 
+    AUX_StringView lnk;
+    if (nome.len == 0) {
+        tok = lexer_expect(l, ABRE_PAR);
+        tok = lexer_expect(l, TEXTO);
+        lnk = (AUX_StringView){l->buf + tok.idx, tok.len};
+        tok = lexer_expect(l, FECHA_PAR);
+
+        assert(lnk.buf && lnk.len < 100);
+        printf("[](%.*s)\n", (int)lnk.len, lnk.buf);
+        node_add_option(node_create(NULL, NULL), NULL, lnk);
+
+        return;
+    } else
+
     prev = *l;
     tok = lexer_next(l);
-    AUX_StringView lnk;
     switch (tok.kind) {
         case FECHA_LINHA: {
+            assert(nome.len != 0);
             curr_speaker = nome;
-            return;
-        } break;
-        case TEXTO: {
-            *l = prev;
-            curr_speaker = nome;
-            parse_fala(l);
-            return;
-        } break;
-        case ABRE_PAR: {
-            tok = lexer_expect(l, TEXTO);
-            lnk = (AUX_StringView){l->buf + tok.idx, tok.len};
-            tok = lexer_expect(l, FECHA_PAR);
-        } break;
-
+        } return;
         default: {
-            lexer_trace(l, tok);
-            UNREACHABLE();
-        } break;
+            assert(nome.len != 0);
+            curr_speaker = nome;
+
+            *l = prev; parse_fala(l);
+        } return;
     }
-    printf("[](%.*s)\n", (int)lnk.len, lnk.buf);
 }
 
 void skip_comment(struct lexer* l) {
@@ -275,10 +267,10 @@ void parse_dialogue(struct lexer* l) {
     while (tok.kind != TOK_EOF) {
         tok = lexer_next(l);
         switch (tok.kind) {
-          case ABRE_TITULO: parse_title(l);           break;
-          case ABRE_FALA:   parse_fala(l);            break;
-          case ABRE_OPCAO:  parse_option(l);          break;
-          case ABRE_COL:    parse_skip_or_speaker(l); break;
+          case ABRE_TITULO: parse_title(l);               break;
+          case ABRE_FALA:   parse_fala(l);                break;
+          case ABRE_OPCAO:  parse_option(l);              break;
+          case ABRE_COL:    parse_speaker_or_redirect(l); break;
 
           case INDENTACAO: {
               struct lexer prev = *l;
@@ -305,7 +297,7 @@ void dialogo_setup(SDL_Renderer* ren) {
 
     TTF_Init();
 
-    dialogo.font = TTF_OpenFont(ASSETS"tiny.ttf", TAM_FONTE);
+    dialogo.font = TTF_OpenFont(ASSETS"básica-unicode-regular.ttf", TAM_FONTE);
     dialogo.current = &dialogo.arvore[0];
     dialogo.waiting = false;
     dialogo.opt_idx = 0;
@@ -317,15 +309,6 @@ void dialogo_setup(SDL_Renderer* ren) {
     }
 
     dialogo.init = true;
-
-    //! isso é um placeholder
-    //DialogueNode *n1, *n2, *n3;
-    //n1 = node_create("Alice", "Oi! Voce quer ir ao parque hoje?"); //! acentuação
-    //n2 = node_create("Alice", "Otimo! O dia esta lindo la fora."); //! acentuação
-    //n3 = node_create("Alice", "Tudo bem, talvez outro dia."); //! acentuação
-
-    //node_add_option(n1, "Sim, vamos!", n2);
-    //node_add_option(n1, "Nao, estou cansado.", n3); //! acentuação
 }
 
 void dialogo_render(SDL_Renderer* ren, TTF_Font* font) {
@@ -353,7 +336,15 @@ void dialogo_render(SDL_Renderer* ren, TTF_Font* font) {
 }
 
 enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
-    const DialogueNode* node = dialogo.current;
+    DialogueNode* node = dialogo.current;
+    if (!node->speaker && !node->text) {
+        assert(node->num_opts == 1);
+        assert(node->options[0].text == NULL);
+
+        DialogueOption* opt = &node->options[dialogo.opt_idx];
+        if (!opt->next) opt->next = section_find(opt->sect)->first;
+        dialogo.current = node = opt->next;
+    }
 
     switch (evt.type) {
       case SDL_KEYDOWN: switch (evt.key.keysym.sym) {
@@ -363,8 +354,11 @@ enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
               assert(node->num_opts == 0 || dialogo.opt_idx < node->num_opts);
 
               if (node->num_opts > 0) {
+                  DialogueOption* opt = &node->options[dialogo.opt_idx];
+                  if (!opt->next) opt->next = section_find(opt->sect)->first;
+
                   if (!dialogo.waiting) dialogo.waiting = true;
-                  else dialogo.current = node->options[dialogo.opt_idx].next;
+                  else dialogo.current = opt->next;
               } else if (node->next) {
                   dialogo.current = node->next;
                   dialogo.waiting = false;
