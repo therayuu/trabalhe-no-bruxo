@@ -110,6 +110,7 @@ void mesa_setup(SDL_Renderer* ren) {
         AUX_TextureInit(ren, &imagens_cartas[i]);
     }
 }
+static SDL_Rect zona_fusao;
 
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     const int rw = W_WIDTH/10, rh = rw*3/2,
@@ -138,7 +139,10 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
         },
     };
     static size_t num_cartas = LEN(cartas);
-
+    zona_fusao.w = W_WIDTH / 6;
+    zona_fusao.h = W_HEIGHT / 4;
+    zona_fusao.x = (W_WIDTH  - zona_fusao.w) / 2;
+    zona_fusao.y = (W_HEIGHT - zona_fusao.h) / 2;
     enum tela prox_tela = MESA;
     switch (evt.type) {
       case SDL_KEYUP: switch (evt.key.keysym.sym) {
@@ -152,6 +156,11 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 
           case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, BRANCO);
+              AUX_SetRenderDrawColor(ren, (SDL_Color){0, 255, 0, 80});
+              SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
+	          SDL_RenderFillRect(ren, &zona_fusao);
+	          SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_NONE);
+              
               for (size_t i = 0; i < num_cartas; i++) {
                   desenhar_carta(ren, cartas[i]);
               }
@@ -173,7 +182,7 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
         for (size_t i = num_cartas-1; i--;) {
             const struct carta* curr = &cartas[i];
 
-            if (SDL_HasIntersection(&last->drag.r, &curr->drag.r)) {
+            if (SDL_HasIntersection(&last->drag.r, &curr->drag.r) && SDL_HasIntersection(&last->drag.r, &zona_fusao) && SDL_HasIntersection(&last->drag.r, &zona_fusao)) {
                 struct carta n = fundir(*last, *curr);
                 if (n.tipo != CARTA_NADA) {
                     *last = n; AUX_RemoveUnordered(cartas, num_cartas, i); break;
