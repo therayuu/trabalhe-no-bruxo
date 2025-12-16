@@ -180,10 +180,9 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     }
 
     struct carta* last = &cartas[num_cartas-1];
-    if (last->drag.state == UNCLICKED) {
-		 if (SDL_HasIntersection(&last->drag.r, &curr->drag.r) && SDL_HasIntersection(&last->drag.r, &zona_fusao) && SDL_HasIntersection(&last->drag.r, &zona_fusao)) {
+    if (last->drag.state == UNCLICKED && SDL_HasIntersection(&last->drag.r, &zona_fusao) && SDL_HasIntersection(&last->drag.r, &zona_fusao)) {
         for (size_t i = num_cartas-1; i--;) {
-	
+			if (SDL_HasIntersection(&last->drag.r, &curr->drag.r) {
             const struct carta* curr = &cartas[i];
 
                 struct carta n = fundir(*last, *curr);
