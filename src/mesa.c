@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <inttypes.h>
 
+#define COR_ZONA_FUSAO VERDE_FRACO
 
 enum tipo_carta {
     CARTA_NADA = 0,
@@ -163,7 +164,7 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 
           case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, BRANCO);
-              AUX_SetRenderDrawColor(ren, VERDE_CLARO);
+              AUX_SetRenderDrawColor(ren, COR_ZONA_FUSAO);
               SDL_RenderFillRect(ren, &zona_fusao);
 
               for (size_t i = 0; i < num_cartas; i++) {
