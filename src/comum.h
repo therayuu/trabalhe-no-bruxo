@@ -3,8 +3,8 @@
 
 #define ASSETS "../assets/"
 
-#define W_WIDTH  1080
-#define W_HEIGHT 720
+#define W_HEIGHT (600)
+#define W_WIDTH  (W_HEIGHT*16/10)
 
 #define FPS 60
 #define TIMEOUT 1000/FPS
@@ -26,6 +26,7 @@ enum tela {
 
 typedef enum {
     AUX_NOEVENT = AUX_FIRSTUSEREVENT,
+    AUX_MERGEEVENT,
 } UserEventType;
 
 #endif//_COMUM_H_
