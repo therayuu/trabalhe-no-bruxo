@@ -5,7 +5,7 @@
 
 #include "lex.h"
 
-#define TAM_FONTE 20
+#define TAM_FONTE (W_HEIGHT/22)
 
 #define FUNDO_NOME  CINZA_MEDIO
 #define FUNDO_TEXTO CINZA_ESCURO
@@ -28,7 +28,7 @@ struct dialog_node {
     size_t num_opts;
     union {
         DialogueNode* next;
-        DialogueOption options[5]; //! tamanho hardcoded
+        DialogueOption options[4]; //! tamanho hardcoded
     };
 };
 
@@ -314,23 +314,36 @@ void dialogo_setup(SDL_Renderer* ren) {
 void dialogo_render(SDL_Renderer* ren, TTF_Font* font) {
     DialogueNode* node = dialogo.current;
 
-    SDL_Rect name = {TAM_FONTE*2, W_WIDTH/2, 10*TAM_FONTE, TAM_FONTE*2 + TAM_FONTE/2};
-    SDL_Rect text = {TAM_FONTE*2, name.y + name.h, W_WIDTH - (TAM_FONTE*4), TAM_FONTE*6};
+    int font_w, font_h;
+    TTF_SizeUTF8(font, "O", &font_w, &font_h);
+
+    const int wpad = font_w, hpad = font_h/2;
+    SDL_Rect text = { .x=wpad, .w = W_WIDTH - (wpad*2), .h = (font_h + hpad/2)*5 };
+    SDL_Rect name = { .x=wpad, .w = 10*font_w,          .h = (font_h + hpad*2)   };
+
+    text.y = W_HEIGHT - text.h - hpad;
+    name.y = text.y - name.h;
+
     AUX_SetRenderDrawColor(ren, FUNDO_TEXTO); SDL_RenderFillRect(ren, &text);
     AUX_SetRenderDrawColor(ren, FUNDO_NOME);  SDL_RenderFillRect(ren, &name);
 
-    AUX_DrawTextTTF(ren, font, node->speaker, name.x + 10, name.y + 10);
-    AUX_DrawTextTTF(ren, font, node->text,    text.x + 10, text.y + 10);
+    AUX_DrawTextTTFWrap(ren, font, node->speaker, name.x + wpad/2, name.y + hpad, 0);
+    AUX_DrawTextTTFWrap(ren, font, node->text,    text.x + wpad/2, text.y + hpad,
+                        text.w - wpad);
 
     if (dialogo.waiting) {
+        char buf[300];
         for (size_t i = 0; i < node->num_opts; ++i) {
-            const char* prefix = (i == dialogo.opt_idx ? "> " : "  ");
-            AUX_DrawTextTTF(ren, font, prefix,
-                            text.x + TAM_FONTE,
-                            text.y + TAM_FONTE*3 + i*(TAM_FONTE+5));
-            AUX_DrawTextTTF(ren, font, node->options[i].text,
-                            text.x + TAM_FONTE*2,
-                            text.y + TAM_FONTE*3 + i*(TAM_FONTE+5));
+            const char prefix = i==dialogo.opt_idx ? '>' : ' ';
+            const DialogueOption opt = node->options[i];
+
+            sprintf(buf, "%c %s", prefix, opt.text);
+            AUX_DrawTextTTF(ren, font, buf,
+                text.x + wpad/2 + font_w + wpad/2,
+                text.y + text.h - (
+                    hpad + (node->num_opts-i)*(font_h + hpad/2)
+                )
+            );
         }
     }
 }
