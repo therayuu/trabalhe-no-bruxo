@@ -16,8 +16,9 @@ enum tipo_carta {
     CARTA_VAPOR,
     CARTA_LAMA,
     CARTA_SOM,
+
     POCAO_ARGILA,
-    POCAO_NADA,
+    POCAO_SOM,
 
     NUM_TIPOS_CARTA,
 };
@@ -99,6 +100,14 @@ struct carta fundir(struct carta curr, struct carta next) {
     return curr;
 }
 
+static const int fusao_w = W_WIDTH  / 6;
+static const int fusao_h = W_HEIGHT / 4;
+static SDL_Rect zona_fusao = {
+    .w = fusao_w, .h = fusao_h,
+    .x = (W_WIDTH  - fusao_w)/2,
+    .y = (W_HEIGHT - fusao_h)/2 + (fusao_h*2)/3,
+};
+
 
 struct estado_mesa {
     bool init;
@@ -112,14 +121,6 @@ void mesa_setup(SDL_Renderer* ren) {
         AUX_TextureInit(ren, &imagens_cartas[i]);
     }
 }
-
-static const int fusao_w = W_WIDTH  / 6;
-static const int fusao_h = W_HEIGHT / 4;
-static SDL_Rect zona_fusao = {
-    .w = fusao_w, .h = fusao_h,
-    .x = (W_WIDTH  - fusao_w)/2,
-    .y = (W_HEIGHT - fusao_h)/2,
-};
 
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     const int rw = W_WIDTH/10, rh = rw*3/2,
