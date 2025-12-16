@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <inttypes.h>
 
+#define COR_ZONA_FUSAO VERDE_FRACO
 
 enum tipo_carta {
     CARTA_NADA = 0,
@@ -16,6 +17,9 @@ enum tipo_carta {
     CARTA_VAPOR,
     CARTA_LAMA,
     CARTA_SOM,
+
+    POCAO_ARGILA,
+    POCAO_SOM,
 
     NUM_TIPOS_CARTA,
 };
@@ -97,6 +101,14 @@ struct carta fundir(struct carta curr, struct carta next) {
     return curr;
 }
 
+static const int fusao_w = W_WIDTH  / 6;
+static const int fusao_h = W_HEIGHT / 4;
+static SDL_Rect zona_fusao = {
+    .w = fusao_w, .h = fusao_h,
+    .x = (W_WIDTH  - fusao_w)/2,
+    .y = (W_HEIGHT - fusao_h)/2 + (fusao_h*2)/3,
+};
+
 
 struct estado_mesa {
     bool init;
@@ -152,6 +164,9 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 
           case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, BRANCO);
+              AUX_SetRenderDrawColor(ren, COR_ZONA_FUSAO);
+              SDL_RenderFillRect(ren, &zona_fusao);
+
               for (size_t i = 0; i < num_cartas; i++) {
                   desenhar_carta(ren, cartas[i]);
               }
@@ -169,11 +184,12 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     }
 
     struct carta* last = &cartas[num_cartas-1];
-    if (last->drag.state == UNCLICKED) {
+    if (last->drag.state == UNCLICKED && SDL_HasIntersection(&last->drag.r, &zona_fusao)) {
         for (size_t i = num_cartas-1; i--;) {
             const struct carta* curr = &cartas[i];
 
-            if (SDL_HasIntersection(&last->drag.r, &curr->drag.r)) {
+            if (SDL_HasIntersection(&last->drag.r, &curr->drag.r) &&
+                SDL_HasIntersection(&curr->drag.r, &zona_fusao)) {
                 struct carta n = fundir(*last, *curr);
                 if (n.tipo != CARTA_NADA) {
                     *last = n; AUX_RemoveUnordered(cartas, num_cartas, i); break;

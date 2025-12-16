@@ -22,6 +22,7 @@ const SDL_Color VERMELHO_M = { 0xF8,0x20,0x20,0xFF };
 const SDL_Color AMARELO_M  = { 0xEE,0xEE,0x10,0xFF };
 const SDL_Color MARROM_M   = { 0x99,0x42,0x13,0xFF };
 
+const SDL_Color VERDE_FRACO  = { 0, 255, 0, 80 };
 const SDL_Color CINZA_MEDIO  = { 80, 80, 80, 255 };
 const SDL_Color CINZA_ESCURO = { 50, 50, 50, 255 };
 
