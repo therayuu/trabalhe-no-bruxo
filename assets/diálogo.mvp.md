@@ -88,8 +88,8 @@
 [Medeia]
     - (Alguma coisa que pode moldar o corpo dele à sua imaginação? Eu não acho que tenho algo para isso...)
     - (... mas que coisa abstrata esse Pedro foi inventar também! Mas não tem jeito, esse é o trabalho que eu sempre quis então eu tenho que me virar!)
-    > [MESA:lama](final_bom)
-    > [MESA:som](final_ruim)
+    > [MESA:pocao_lama](final_bom)
+    > [MESA:pocao_som](final_ruim)
 
 # final_bom
 
@@ -98,7 +98,7 @@
     > Medeia mistura Argila com vazio
     - (Consegui! Eu decifrei minha primeira receita!!)
 
-    > [nada mais feito ainda]
+    - [nada mais feito ainda]
 
 [](fim)
 

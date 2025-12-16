@@ -169,8 +169,8 @@
     - (Medeia volta ao balcão)
 [Medeia]
     - Agora é só ter certeza que eu vou entregar o elemento certo.
-    > [Entregar a poção](final_bom)
-    > [Entregar uma mistura falsa](final_ruim)
+    > [MESA:pocao_lama](final_bom)
+    > [MESA:pocao_som](final_ruim)
 
 # final_bom
 
