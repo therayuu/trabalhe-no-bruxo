@@ -18,17 +18,51 @@ enum tipo_carta {
     CARTA_LAMA,
     CARTA_SOM,
 
-    POCAO_ARGILA,
+    POCAO_LAMA,
     POCAO_SOM,
 
     NUM_TIPOS_CARTA,
 };
+
+char* tipo_carta_str[NUM_TIPOS_CARTA] = {
+    [CARTA_NADA]  = "nada",
+    [CARTA_FOGO]  = "fogo",
+    [CARTA_AGUA]  = "agua",
+    [CARTA_TERRA] = "terra",
+    [CARTA_AR]    = "ar",
+    [CARTA_VAPOR] = "vapor",
+    [CARTA_LAMA]  = "lama",
+    [CARTA_SOM]   = "som",
+    [POCAO_LAMA]  = "pocao_lama",
+    [POCAO_SOM]   = "pocao_som",
+};
+
+enum tipo_carta tipo_carta_from_str(const char* s) {
+    for (size_t i = 0; i < LEN(tipo_carta_str); i++) {
+        if (streql(tipo_carta_str[i], s))
+            return (enum tipo_carta)i;
+    }
+    return (enum tipo_carta)0;
+}
 
 struct carta {
     DragDropRect drag;
     enum tipo_carta tipo;
     uint16_t cliques;
 };
+
+void FillMergeEvent(SDL_Event* evt, struct carta* carta) {
+     evt->user = (SDL_UserEvent) {
+         .type = SDL_USEREVENT,
+         .code = AUX_MERGEEVENT,
+         .data1 = (void*)carta->tipo,
+         .timestamp = SDL_GetTicks(),
+     };
+}
+void EmitMergeEvent(struct carta* carta) {
+    SDL_Event evt; FillMergeEvent(&evt, carta);
+    SDL_PushEvent(&evt);
+}
 
 static AUX_Texture fundo_carta = { .img_path = ASSETS"fundo_carta.png" };
 static AUX_Texture imagens_cartas[NUM_TIPOS_CARTA] = {
@@ -90,6 +124,9 @@ enum tipo_carta combinar(const enum tipo_carta t1, const enum tipo_carta t2) {
         case par(CARTA_TERRA, CARTA_AGUA): return CARTA_LAMA;
         case par(CARTA_FOGO,  CARTA_AR):   return CARTA_SOM;
 
+        case par(CARTA_LAMA,  CARTA_NADA): return POCAO_LAMA;
+        case par(CARTA_SOM,   CARTA_NADA): return POCAO_SOM;
+
         default: return CARTA_NADA;
     }
 }
@@ -122,6 +159,10 @@ void mesa_setup(SDL_Renderer* ren) {
         AUX_TextureInit(ren, &imagens_cartas[i]);
     }
 }
+
+//! claramente fora de lugar
+//! deveria ser um ponteiro dentro do struct, que atualiza a partir de um evento
+enum tipo_carta pocoes_possiveis[5] = {0}; //! hardcoded
 
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     const int rw = W_WIDTH/10, rh = rw*3/2,
@@ -192,7 +233,11 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
                 SDL_HasIntersection(&curr->drag.r, &zona_fusao)) {
                 struct carta n = fundir(*last, *curr);
                 if (n.tipo != CARTA_NADA) {
-                    *last = n; AUX_RemoveUnordered(cartas, num_cartas, i); break;
+                    *last = n; AUX_RemoveUnordered(cartas, num_cartas, i);
+                    if (AUX_NullTerminatedFind(pocoes_possiveis, &n.tipo)) {
+                        EmitMergeEvent(&n); return DIALOGO;
+                    }
+                    break;
                 }
             }
         }

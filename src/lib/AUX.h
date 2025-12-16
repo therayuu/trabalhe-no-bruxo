@@ -150,6 +150,34 @@ void AUX_ToEndSzLen(void* arr, size_t size, size_t len, size_t idx) {
     AUX_ToEndLen(arr, len, i); len -= 1; \
 } while(0)
 
+static inline
+#define AUX_Find(arr, needle) AUX_FindLen(arr, LEN(arr), needle)
+#define AUX_FindLen(arr, len, needle) AUX_FindSzLen(arr, sizeof(*arr), len, needle)
+void* AUX_FindSzLen(void* arr, size_t size, size_t len, void* needle) {
+  #define elem(arr, size, idx) ((arr) + (size)*(idx))
+    char *const base = arr;
+    for (size_t i = 0; i < len; i++) {
+        char *const curr = elem(base, size, i);
+        if (memcmp(curr, needle, size) == 0) return curr;
+    } return NULL;
+  #undef elem
+}
+
+static inline
+#define AUX_NullTerminatedLen(arr) AUX_NullTerminatedLenSz(arr, sizeof(*arr))
+size_t AUX_NullTerminatedLenSz(void* arr, size_t size) {
+  #define elem(arr, size, idx) ((arr) + (size)*(idx))
+    char zero[size]; memset(zero, 0, size);
+    char *const base = arr;
+    for (size_t i = 0;; i++) {
+        char *const curr = elem(base, size, i);
+        if (memcmp(curr, zero, size) == 0) return i;
+    }
+  #undef elem
+}
+
+#define AUX_NullTerminatedFind(arr, needle) AUX_FindLen(arr, AUX_NullTerminatedLen(arr), needle)
+
 
 /* GRÁFICOS */
 typedef struct {
