@@ -1,12 +1,14 @@
-# caso-1
+# caso_1
 
 [Medeia] Mal posso esperar para o meu primeiro dia nesse emprego!
 [Pedro]  Aí, cê vai me atender ou vai ficar aí pensando na morte da bezerra?
 [Medeia] Ah desculpa sen-- Pedro?!
 [Pedro]  Eu te conheço, menina?
 [Medeia]
-        > Não, acho que deve ter sido engano...
-        > A gente estudou junto, seu abusado!
+    > [Não, acho que deve ter sido engano...](caso_1_1)
+    > [A gente estudou junto, seu abusado!](caso_1_1)
+
+# caso_1_1
 
 [Pedro]  Ah... Pera, Medeia?!
 
@@ -41,37 +43,37 @@
 [Medeia]
     - (Me parece que você devia parar de chamar essas coisas de idiotice.)
     - E o que a gente tem a ver com isso?
-Pedro]
+[Pedro]
     - Eu... falei pra ele que era uma menina.
 
-    > Ele mostra a descrição de seu, está escrito] "totalmente uma garota, pode confiar rsrs"
+    > Ele mostra a descrição de seu, está escrito: "totalmente uma garota, pode confiar rsrs"
 
     - Eu preciso de alguma coisa que me faça parecer uma menina pra ele.
 
 [Medeia]
     - (E lá está. Agora sim é o Pedro que eu conheço.)
-    > [Você já pensou em só pagar por uma cirurgia que nem os outros?](pedro-1)
-    > [Sinto muito, não posso te ajudar com isso.](pedro-2)
-    > [Tudo bem! Aceitamos o seu caso.](pedro-3)
+    > [Você já pensou em só pagar por uma cirurgia que nem os outros?](pedro_1)
+    > [Sinto muito, não posso te ajudar com isso.](pedro_2)
+    > [Tudo bem! Aceitamos o seu caso.](pedro_3)
 
-# pedro-1
+# pedro_1
 [Pedro] Tá maluca?? Não nasci herdeiro, não!
 
-[](pedro-3)
+[](pedro_3)
 
-# pedro-2
+# pedro_2
 [Pedro] Não foi isso que a placa de vocês disse! Pô Medea, me ajuda ai.
 
-[](pedro-3)
+[](pedro_3)
 
-# pedro-3
+# pedro_3
 [Medeia]
     - Ok. Me descreve exatamente as coisas que você precisa que mudem.
 [Pedro]
     - Tá. Pra falar a verdade, eu acho que eu preciso de uma coisa bastante simples.
     - Eu preciso de alguma coisa que me deixe moldar o meu corpo.
-    -Algo que aproxime ele do que eu imagino.
-    - ...E quem sabe uma dose de coragem?
+    - Algo que aproxime ele do que eu imagino.
+    - ... e quem sabe uma dose de coragem?
 
 [Medeia] Mais alguma coisa?
 [Pedro]  Você tem uma saia?
@@ -81,42 +83,31 @@ Pedro]
 [Medeia]
     - Espera, na verdade é sim! Vai lá na frente que a gente tá vendendo. 
     - Mas vai te custar separado!
-    (Pedro sai, deixando Medeia para pensar na receita.)
+    > Pedro sai, deixando Medeia para pensar na receita.
 
 [Medeia]
     - (Alguma coisa que pode moldar o corpo dele à sua imaginação? Eu não acho que tenho algo para isso...)
-    -(...Mas que coisa abstrata esse Pedro foi inventar também! Mas não tem jeito, esse é o trabalho que eu sempre quis então eu tenho que me virar!)
-    > Medeia junta terra com Água. [](caminho-bom)
-    > Medeia junta ar com com fogo. [](caminho-ruim)
-   
-#caminho-bom
+    - (... mas que coisa abstrata esse Pedro foi inventar também! Mas não tem jeito, esse é o trabalho que eu sempre quis então eu tenho que me virar!)
+    > [MESA:lama](final_bom)
+    > [MESA:som](final_ruim)
+
+# final_bom
+
+[Medeia]
     - (Ótimo! Usando os poderes da argila vai ser muito fácil modelar o próprio corpo. Mas eu ainda preciso dar um jeito de sintetizar isso em uma poção...)
     > Medeia mistura Argila com vazio
     - (Consegui! Eu decifrei minha primeira receita!!)
-    [](entrega)
-    
-#caminho-ruim
-    -(Som?! Bem... Pelo menos isso vai melhorar aquela voz insuportável dele...)
-    (Medeia volta ao balcão)
-    >Medeia mistura Som com vazio
-    -(Err...Eu tenho quase certeza que isso vai funcionar! Qual a pior coisa que poderia acontecer?)
-    [](entrega)
 
-#entrega
+    > [nada mais feito ainda]
+
+[](fim)
+
+# final_ruim
+
 [Medeia]
-    (Agora é só esperar o Pedro e torcer pelo melhor...)
-    - Preciso ter certeza que eu vou entregar o elemento certo.
-    > Entregar a poção [](final-bom)
-    > Entregar uma mistura falsa [](final-ruim)
-
-# final-bom
-
-- [nada feito ainda]
-
-
-# final-ruim
-
-> Medeia volta ao balcão.
+    - (Som?! Bem... Pelo menos isso vai melhorar aquela voz insuportável dele...)
+    > Medeia volta ao balcão
+    - (Err... Eu tenho quase certeza que isso vai funcionar! Qual a pior coisa que poderia acontecer?)
 [Pedro]
     - E aí? A parada tá pronta?
 [Medeia]
@@ -164,11 +155,11 @@ Pedro]
     > Gabriel vê Pedro na distância e começa a andar até ele.
 [Pedro]
     - (DROGA! Ele me viu, o que eu faço?!)
-    E aí, cara... Que coincidência, haha...
+    - E aí, cara... Que coincidência, haha...
 [Gabriel]
-    _ Você não vai acreditar! Eu tô esperando a maior gata, a gente vai sair num encontro.
-    _ Conheci ela no Kinder, ela é até meio parecida com você.
-    _ Huh... Enfim! Como você tá? Sair pra passear num parquinho não é muito a sua cara.
+    - Você não vai acreditar! Eu tô esperando a maior gata, a gente vai sair num encontro.
+    - Conheci ela no Kinder, ela é até meio parecida com você.
+    - Huh... Enfim! Como você tá? Sair pra passear num parquinho não é muito a sua cara.
 [Pedro]
     - É, eu prefiro o cemitério mesmo...
 [Gabriel]
@@ -263,8 +254,8 @@ Pedro]
 [Pedro]
     - Não é isso...
     - (O que eu falo pra ele?! Será que eu conto pra ele...)
-    // Tive a ideia de colocar uma opção de diálogo aqui onde você pode se declarar ou não //
-    // Por enquanto segue com o caso onde Pedro se declara //
+    ## Tive a ideia de colocar uma opção de diálogo aqui onde você pode se declarar ou não #
+    ## Por enquanto segue com o caso onde Pedro se declara #
     - Era tudo uma brincadeira no começo, pelo menos eu achei que sim.
     - Mas depois de um tempo, as coisas ficaram diferentes.
     > Gabriel põe as mãos na cintura e começa a escutar com atenção.
@@ -322,7 +313,7 @@ Pedro]
     - Não precisa se você achar que a gente tá indo rápido demais.
 [Pedro]
     - Não! Eu quero sim.
-Gabriel]
+[Gabriel]
     - Então vem cá!
     > Os dois se aproximam envergonhados e se dão um selinho.
     > Mas no meio do beijo algo começa a mudar.
@@ -337,4 +328,8 @@ Gabriel]
 [Pedro]
     - (MEDEIIAAAAAAAAAAAAAAAAAAAAA-)
     - AAWOOOOOOOOOOOOOOOO!
+
+[](fim)
+
+# fim
 
