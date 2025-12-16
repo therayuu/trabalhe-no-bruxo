@@ -25,10 +25,12 @@ struct dialog_node {
     const char* speaker;
     const char* text;
 
+    bool action;
+
     size_t num_opts;
     union {
         DialogueNode* next;
-        DialogueOption options[4]; //! tamanho hardcoded
+        DialogueOption opts[4]; //! tamanho hardcoded
     };
 };
 
@@ -39,7 +41,7 @@ static struct estado_dialogo {
     size_t count;
     DialogueNode arvore[300];
 
-    bool waiting;
+    bool choosing;
     size_t opt_idx;
     DialogueNode* current;
 
@@ -68,12 +70,12 @@ DialogueNode* node_create(const char* speaker, const char* text) {
 }
 
 void node_add_option(DialogueNode* n, const char* text, AUX_StringView sect) {
-    assert(n->num_opts < LEN(n->options));
+    assert(n->num_opts < LEN(n->opts));
 
     size_t idx = n->num_opts++;
-    n->options[idx].text = text;
-    n->options[idx].next = NULL;
-    n->options[idx].sect = sect;
+    n->opts[idx].text = text;
+    n->opts[idx].next = NULL;
+    n->opts[idx].sect = sect;
 }
 
 typedef struct {
@@ -98,6 +100,23 @@ Section* section_find(AUX_StringView name) {
     }
     return NULL;
 }
+
+//! tá claramente fora de lugar
+//! devia usar um array local e mandar o ponteiro via evento
+void pocoes_possiveis_add(const char* s) {
+    size_t len = AUX_NullTerminatedLen(pocoes_possiveis);
+    assert(len+1 < LEN(pocoes_possiveis));
+    pocoes_possiveis[len] = tipo_carta_from_str(s);
+    pocoes_possiveis[len+1] = 0;
+}
+
+size_t pocoes_possiveis_find(enum tipo_carta carta) { //! AUX_NullTerminatedIndex
+    for (size_t i = 0; pocoes_possiveis[i]; i++) {
+        if (pocoes_possiveis[i] == carta) return i;
+    }
+    return SIZE_MAX;
+}
+
 
 AUX_StringView curr_speaker = {0};
 
@@ -179,7 +198,22 @@ void parse_option(struct lexer* l) {
     tok = lexer_expect(l, ABRE_COL);
     tok = lexer_expect(l, TEXTO);
     AUX_StringView str = {l->buf + tok.idx, tok.len};
-    tok = lexer_expect(l, FECHA_COL);
+    tok = lexer_next(l);
+    switch (tok.kind) {
+        case FECHA_COL: break;
+        case FECHA_NOME: {
+            assert(AUX_StringViewEq(str, AUX_SV("MESA")));
+            node_last()->action = true;
+
+            tok = lexer_expect(l, TEXTO);
+            str = (AUX_StringView){l->buf + tok.idx, tok.len};
+            tok = lexer_expect(l, FECHA_COL);
+        } break;
+        default: {
+            lexer_trace(l, tok);
+            UNREACHABLE();
+        } break;
+    }
 
     tok = lexer_expect(l, ABRE_PAR);
     tok = lexer_expect(l, TEXTO);
@@ -298,16 +332,15 @@ void dialogo_setup(SDL_Renderer* ren) {
     TTF_Init();
 
     dialogo.font = TTF_OpenFont(ASSETS"básica-unicode-regular.ttf", TAM_FONTE);
-    dialogo.current = &dialogo.arvore[0];
-    dialogo.waiting = false;
-    dialogo.opt_idx = 0;
-    dialogo.count = 0;
-
     if (!dialogo.init) {
-        lexer_init(&dialogo.lexer, ASSETS"diálogo.md");
+        dialogo.current = &dialogo.arvore[0];
+        dialogo.choosing = false;
+        dialogo.opt_idx = 0;
+        dialogo.count = 0;
+
+        lexer_init(&dialogo.lexer, ASSETS"diálogo.mvp.md");
         parse_dialogue(&dialogo.lexer);
     }
-
     dialogo.init = true;
 }
 
@@ -331,11 +364,11 @@ void dialogo_render(SDL_Renderer* ren, TTF_Font* font) {
     AUX_DrawTextTTFWrap(ren, font, node->text,    text.x + wpad/2, text.y + hpad,
                         text.w - wpad);
 
-    if (dialogo.waiting) {
+    if (dialogo.choosing && !node->action) {
         char buf[300];
         for (size_t i = 0; i < node->num_opts; ++i) {
             const char prefix = i==dialogo.opt_idx ? '>' : ' ';
-            const DialogueOption opt = node->options[i];
+            const DialogueOption opt = node->opts[i];
 
             sprintf(buf, "%c %s", prefix, opt.text);
             AUX_DrawTextTTF(ren, font, buf,
@@ -352,9 +385,9 @@ enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
     DialogueNode* node = dialogo.current;
     if (!node->speaker && !node->text) {
         assert(node->num_opts == 1);
-        assert(node->options[0].text == NULL);
+        assert(node->opts[0].text == NULL);
 
-        DialogueOption* opt = &node->options[dialogo.opt_idx];
+        DialogueOption* opt = &node->opts[dialogo.opt_idx];
         if (!opt->next) opt->next = section_find(opt->sect)->first;
         dialogo.current = node = opt->next;
     }
@@ -367,29 +400,45 @@ enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
               assert(node->num_opts == 0 || dialogo.opt_idx < node->num_opts);
 
               if (node->num_opts > 0) {
-                  DialogueOption* opt = &node->options[dialogo.opt_idx];
+                  DialogueOption* opt = &node->opts[dialogo.opt_idx];
                   if (!opt->next) opt->next = section_find(opt->sect)->first;
 
-                  if (!dialogo.waiting) dialogo.waiting = true;
-                  else dialogo.current = opt->next;
+                  if (!dialogo.choosing) {
+                      dialogo.choosing = true;
+                      if (node->action) {
+                          pocoes_possiveis[0] = 0;
+                          for (size_t i = 0; i < node->num_opts; i++)
+                              pocoes_possiveis_add(node->opts[i].text);
+                          return MESA;
+                      }
+                  } else if (!node->action) dialogo.current = opt->next;
               } else if (node->next) {
                   dialogo.current = node->next;
-                  dialogo.waiting = false;
+                  dialogo.choosing = false;
               }
 
               dialogo.opt_idx = 0;
           } break;
 
           //! puxar lógica do menu
-          case SDLK_UP: if (node->num_opts > 0) {
+          case SDLK_UP: if (node->num_opts > 0 && !node->action) {
               dialogo.opt_idx = (dialogo.opt_idx - 1 + node->num_opts) % node->num_opts;
           } break;
-          case SDLK_DOWN: if (node->num_opts > 0) {
+          case SDLK_DOWN: if (node->num_opts > 0 && !node->action) {
               dialogo.opt_idx = (dialogo.opt_idx + 1) % node->num_opts;
           } break;
       } break;
 
       case SDL_USEREVENT: switch (evt.user.code) {
+          case AUX_MERGEEVENT: {
+              assert(node->action);
+              dialogo.opt_idx = pocoes_possiveis_find((enum tipo_carta)evt.user.data1);
+
+              DialogueOption* opt = &node->opts[dialogo.opt_idx];
+              if (!opt->next) opt->next = section_find(opt->sect)->first;
+              dialogo.current = opt->next;
+              dialogo.choosing = false;
+          } break;
           case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, PRETO); //! colocar fundo
               dialogo_render(ren, dialogo.font);

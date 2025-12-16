@@ -17,6 +17,8 @@
 #define menor(prev, curr) (prev<curr ? prev : curr)
 #define par(prev, curr) trans(menor(prev, curr), maior(prev, curr))
 
+#define streql(s1, s2) (strcmp(s1,s2) == 0)
+
 enum tela {
     ZERO = 0,
     MENU,
