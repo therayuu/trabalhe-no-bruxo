@@ -16,8 +16,8 @@ enum tipo_carta {
     CARTA_VAPOR,
     CARTA_LAMA,
     CARTA_SOM,
-	POCAO_ARGILA,
-	POCAO_NADA,
+    POCAO_ARGILA,
+    POCAO_NADA,
 
     NUM_TIPOS_CARTA,
 };
@@ -113,11 +113,13 @@ void mesa_setup(SDL_Renderer* ren) {
     }
 }
 
-static SDL_Rect zona_fusao;
-zona_fusao.w = W_WIDTH / 6;
-zona_fusao.h = W_HEIGHT / 4;
-zona_fusao.x = (W_WIDTH  - zona_fusao.w) / 2;
-zona_fusao.y = (W_HEIGHT - zona_fusao.h) / 2;
+static const int fusao_w = W_WIDTH  / 6;
+static const int fusao_h = W_HEIGHT / 4;
+static SDL_Rect zona_fusao = {
+    .w = fusao_w, .h = fusao_h,
+    .x = (W_WIDTH  - fusao_w)/2,
+    .y = (W_HEIGHT - fusao_h)/2,
+};
 
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     const int rw = W_WIDTH/10, rh = rw*3/2,
@@ -160,9 +162,9 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
 
           case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, BRANCO);
-			  AUX_SetRenderDrawColor(ren, VERDE_CLARO);
-			  SDL_RenderFillRect(ren, &zona_fusao);
-              
+              AUX_SetRenderDrawColor(ren, VERDE_CLARO);
+              SDL_RenderFillRect(ren, &zona_fusao);
+
               for (size_t i = 0; i < num_cartas; i++) {
                   desenhar_carta(ren, cartas[i]);
               }
@@ -180,11 +182,12 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     }
 
     struct carta* last = &cartas[num_cartas-1];
-    if (last->drag.state == UNCLICKED && SDL_HasIntersection(&last->drag.r, &zona_fusao) && SDL_HasIntersection(&last->drag.r, &zona_fusao)) {
+    if (last->drag.state == UNCLICKED && SDL_HasIntersection(&last->drag.r, &zona_fusao)) {
         for (size_t i = num_cartas-1; i--;) {
-			if (SDL_HasIntersection(&last->drag.r, &curr->drag.r) {
             const struct carta* curr = &cartas[i];
 
+            if (SDL_HasIntersection(&last->drag.r, &curr->drag.r) &&
+                SDL_HasIntersection(&curr->drag.r, &zona_fusao)) {
                 struct carta n = fundir(*last, *curr);
                 if (n.tipo != CARTA_NADA) {
                     *last = n; AUX_RemoveUnordered(cartas, num_cartas, i); break;
