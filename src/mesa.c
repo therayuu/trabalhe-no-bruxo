@@ -71,18 +71,15 @@ static AUX_Texture imagens_cartas[NUM_TIPOS_CARTA] = {
     [CARTA_FOGO ] = { .img_path = ASSETS"carta_fogo.png" },
     [CARTA_TERRA] = { .img_path = ASSETS"carta_terra.png" },
     [CARTA_AR   ] = { .img_path = ASSETS"carta_ar.png" },
+    [CARTA_LAMA ] = { .img_path = ASSETS"carta_lama.png" },
+    [CARTA_SOM  ] = { .img_path = ASSETS"carta_som.png" },
     [CARTA_VAPOR] = {
         .color = &CINZA,
         .img_path = ASSETS"carta_vapor.png"
     },
-    [CARTA_LAMA ] = {
-        .color = &MARROM,
-        .img_path = ASSETS"carta_lama.png",
-    },
-    [CARTA_SOM  ] = {
-        .color = &PRETO,
-        .img_path = ASSETS"carta_som.png",
-    },
+
+    [POCAO_LAMA] = { .img_path = ASSETS"carta_poção_lama.png" },
+    [POCAO_SOM ] = { .img_path = ASSETS"carta_poção_som.png" },
 };
 
 void desenhar_carta(SDL_Renderer* ren, const struct carta carta) {
