@@ -1,6 +1,6 @@
 ---
 title: Trabalhe no Bruxó
-subtitle: P6 - Estado final do processo
+subtitle: P6 - Apresentação Final
 author: Rafaela Grillo & Theo Albuquerque & Yuri Sacksida
 ...
 
@@ -65,6 +65,10 @@ author: Rafaela Grillo & Theo Albuquerque & Yuri Sacksida
 ## Elementos
 
 ![](img/cartas-p6.png)
+
+## Elementos
+
+![](img/cartas-reorganizadas-p6.png)
 
 ## Elementos
 
