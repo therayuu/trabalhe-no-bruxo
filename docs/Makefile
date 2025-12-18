@@ -1,9 +1,9 @@
 defaults = ./config/defaults.yaml
 header   = ./config/header.tex
 
-all: Apresentação.pdf Estado-final.pdf avanços
+all: Apresentação.pdf Estado-final.pdf Avanços
 
-avanços: Avanços-2.pdf \
+Avanços: Avanços-2.pdf \
          Avanços-3.pdf \
 
 %.pdf: %.md $(defaults) $(header)
@@ -11,4 +11,4 @@ avanços: Avanços-2.pdf \
 	    --defaults=$(defaults) \
 	    --include-in-header=$(header)
 
-.PHONY: all avanços
+.PHONY: all Avanços
