@@ -232,7 +232,7 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
                 if (n.tipo != CARTA_NADA) {
                     *last = n; AUX_RemoveUnordered(cartas, num_cartas, i);
                     if (AUX_NullTerminatedFind(pocoes_possiveis, &n.tipo)) {
-                        EmitMergeEvent(&n); return DIALOGO;
+                        EmitMergeEvent(&n); return LOJA;
                     }
                     break;
                 }

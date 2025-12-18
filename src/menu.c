@@ -27,7 +27,7 @@ static AUX_Button botoes[] = {
   },
   {
     {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*1, .w=w, .h=h},
-    .label = "dialogo", .out = DIALOGO, //! trocar de volta pra "config"
+    .label = "loja", .out = LOJA, //! trocar de volta pra "config"
   },
   {
     {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*2, .w=w, .h=h},

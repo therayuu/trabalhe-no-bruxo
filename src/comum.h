@@ -23,7 +23,7 @@ enum tela {
     ZERO = 0,
     MENU,
     MESA,
-    DIALOGO,
+    LOJA,
 };
 
 typedef enum {

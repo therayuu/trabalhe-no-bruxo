@@ -35,21 +35,21 @@ int main() {
             case ZERO: prox = MENU; break;
             case MENU: prox = menu_loop(ren, evt); break;
             case MESA: prox = mesa_loop(ren, evt); break;
-            case DIALOGO: prox = dialogo_loop(ren, evt); break;
+            case LOJA: prox = loja_loop(ren, evt); break;
         }
 
         switch (prox_diff(tela, prox)) {
             case ZERO: break;
             case MENU: menu_setup(ren); break;
             case MESA: mesa_setup(ren); break;
-            case DIALOGO: dialogo_setup(ren); break;
+            case LOJA: loja_setup(ren); break;
         }
 
         switch (curr_diff(tela, prox)) {
             case ZERO: break;
             case MENU: menu_free(); break;
             case MESA: mesa_free(); break;
-            case DIALOGO: dialogo_free(); break;
+            case LOJA: loja_free(); break;
         }
 
         switch (trans(tela, prox)) {
