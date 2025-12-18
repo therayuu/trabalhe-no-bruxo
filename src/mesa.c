@@ -227,21 +227,21 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     }
 
     struct carta* last = &cartas[num_cartas-1];
-    if (last->drag.state == UNCLICKED && SDL_HasIntersection(&last->drag.r, &zona_fusao)) {
+    if (SDL_HasIntersection(&last->drag.r, &zona_fusao) &&
+        last->drag.state == UNCLICKED) {
         for (size_t i = num_cartas-1; i--;) {
             const struct carta* curr = &cartas[i];
+            if (!SDL_HasIntersection(&last->drag.r, &curr->drag.r) ||
+                !SDL_HasIntersection(&curr->drag.r, &zona_fusao)) continue;
 
-            if (SDL_HasIntersection(&last->drag.r, &curr->drag.r) &&
-                SDL_HasIntersection(&curr->drag.r, &zona_fusao)) {
-                struct carta n = fundir(*last, *curr);
-                if (n.tipo != CARTA_NADA) {
-                    *last = n; AUX_RemoveUnordered(cartas, num_cartas, i);
-                    if (AUX_NullTerminatedFind(pocoes_possiveis, &n.tipo)) {
-                        EmitMergeEvent(&n); return LOJA;
-                    }
-                    break;
-                }
+            struct carta n = fundir(*last, *curr);
+            if (n.tipo == CARTA_NADA) continue;
+
+            *last = n; AUX_RemoveUnordered(cartas, num_cartas, i);
+            if (AUX_NullTerminatedFind(pocoes_possiveis, &n.tipo)) {
+                EmitMergeEvent(&n); prox_tela = LOJA;
             }
+            break;
         }
     }
 
