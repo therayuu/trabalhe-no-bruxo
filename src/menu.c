@@ -23,11 +23,11 @@ const int w = W_WIDTH/5, h = W_HEIGHT/10, pad = h/10, sep = h + pad;
 static AUX_Button botoes[] = {
   {
     {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*0, .w=w, .h=h},
-    .label = "mesa", .out = MESA, //! trocar de volta pra "jogar"
+    .label = "jogar", .out = LOJA, //! não sei se devia ser direto assim
   },
   {
     {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*1, .w=w, .h=h},
-    .label = "loja", .out = LOJA, //! trocar de volta pra "config"
+    .label = "mesa", .out = MESA, //! fazer um "config"
   },
   {
     {.x=W_WIDTH/2 - w/2, .y=(W_HEIGHT - sep*4)+sep/8 + sep*2, .w=w, .h=h},
