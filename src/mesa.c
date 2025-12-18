@@ -140,7 +140,7 @@ static const int fusao_h = W_HEIGHT / 4;
 static SDL_Rect zona_fusao = {
     .w = fusao_w, .h = fusao_h,
     .x = (W_WIDTH  - fusao_w)/2,
-    .y = (W_HEIGHT - fusao_h)/2 + (fusao_h*2)/3,
+    .y = (W_HEIGHT - fusao_h)/2,
 };
 
 
@@ -162,29 +162,34 @@ void mesa_setup(SDL_Renderer* ren) {
 enum tipo_carta pocoes_possiveis[5] = {0}; //! hardcoded
 
 enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
-    const int rw = W_WIDTH/10, rh = rw*3/2,
-              sep = rw+pad, hmid = (W_HEIGHT-rh)/2;
+    const int rw = W_WIDTH/10, rh = rw*3/2, sep = rw+pad,
+              hmax = W_HEIGHT-rh, wmax = W_WIDTH-rw;
     static struct carta cartas[] = {
         {
-            .drag={ .r.x = sep*0, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
+            .drag={ .r.x = sep*0, .r.y = hmax*2/3, .r.w=rw, .r.h=rh }, .tipo=0,
         }, {
-            .drag={ .r.x = sep*1, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=1,
+            .drag={ .r.x = sep*0, .r.y = hmax*1/3, .r.w=rw, .r.h=rh }, .tipo=0,
         }, {
-            .drag={ .r.x = sep*2, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=2,
+            .drag={ .r.x = sep*1, .r.y = hmax*2/3, .r.w=rw, .r.h=rh }, .tipo=1,
         }, {
-            .drag={ .r.x = sep*3, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=3,
+            .drag={ .r.x = sep*1, .r.y = hmax*1/3, .r.w=rw, .r.h=rh }, .tipo=1,
         }, {
-            .drag={ .r.x = sep*4, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=4,
+            .drag={ .r.x = sep*2, .r.y = hmax*2/3, .r.w=rw, .r.h=rh }, .tipo=2,
         }, {
-            .drag={ .r.x = sep*5, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=4,
+            .drag={ .r.x = sep*2, .r.y = hmax*1/3, .r.w=rw, .r.h=rh }, .tipo=2,
+        },
+        {
+            .drag={ .r.x = wmax - sep*2, .r.y = hmax*2/3, .r.w=rw, .r.h=rh }, .tipo=3,
         }, {
-            .drag={ .r.x = sep*6, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=3,
+            .drag={ .r.x = wmax - sep*2, .r.y = hmax*1/3, .r.w=rw, .r.h=rh }, .tipo=3,
         }, {
-            .drag={ .r.x = sep*7, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=2,
+            .drag={ .r.x = wmax - sep*1, .r.y = hmax*2/3, .r.w=rw, .r.h=rh }, .tipo=4,
         }, {
-            .drag={ .r.x = sep*8, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=1,
+            .drag={ .r.x = wmax - sep*1, .r.y = hmax*1/3, .r.w=rw, .r.h=rh }, .tipo=4,
         }, {
-            .drag={ .r.x = sep*9, .r.y = hmid, .r.w=rw, .r.h=rh }, .tipo=0,
+            .drag={ .r.x = wmax - sep*0, .r.y = hmax*2/3, .r.w=rw, .r.h=rh }, .tipo=0,
+        }, {
+            .drag={ .r.x = wmax - sep*0, .r.y = hmax*1/3, .r.w=rw, .r.h=rh }, .tipo=0,
         },
     };
     static size_t num_cartas = LEN(cartas);
