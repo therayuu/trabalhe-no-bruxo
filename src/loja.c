@@ -394,7 +394,7 @@ enum tela loja_loop(SDL_Renderer* ren, SDL_Event evt) {
 
     switch (evt.type) {
       case SDL_KEYDOWN: switch (evt.key.keysym.sym) {
-          case SDLK_ESCAPE: return MENU;
+          case SDLK_q: return MENU;
 
           case SDLK_SPACE: case SDLK_RETURN: {
               assert(node->num_opts == 0 || loja.opt_idx < node->num_opts);

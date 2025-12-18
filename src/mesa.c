@@ -197,7 +197,7 @@ enum tela mesa_loop(SDL_Renderer* ren, SDL_Event evt) {
     enum tela prox_tela = MESA;
     switch (evt.type) {
       case SDL_KEYUP: switch (evt.key.keysym.sym) {
-          case SDLK_ESCAPE: prox_tela = MENU; break;
+          case SDLK_q: prox_tela = MENU; break;
       } break;
 
       case SDL_USEREVENT: switch (evt.user.code) {
