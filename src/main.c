@@ -7,7 +7,7 @@
 #include "comum.h"
 #include "menu.c"
 #include "mesa.c"
-#include "dialogo.c"
+#include "loja.c"
 
 
 int main() {
