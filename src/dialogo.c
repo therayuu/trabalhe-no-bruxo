@@ -34,7 +34,7 @@ struct dialog_node {
     };
 };
 
-static struct estado_dialogo {
+static struct estado_loja {
     bool init;
     struct lexer lexer;
 
@@ -46,7 +46,7 @@ static struct estado_dialogo {
     DialogueNode* current;
 
     TTF_Font* font;
-} dialogo;
+} loja;
 
 void* node_fill(DialogueNode* n, const char* speaker, const char* text) {
     memset(n, 0, sizeof(*n));
@@ -57,12 +57,12 @@ void* node_fill(DialogueNode* n, const char* speaker, const char* text) {
 }
 
 DialogueNode* node_last() {
-    return &dialogo.arvore[dialogo.count-1];
+    return &loja.arvore[loja.count-1];
 }
 
 DialogueNode* node_alloc() {
-    assert(dialogo.count < LEN(dialogo.arvore));
-    return &dialogo.arvore[dialogo.count++];
+    assert(loja.count < LEN(loja.arvore));
+    return &loja.arvore[loja.count++];
 }
 
 DialogueNode* node_create(const char* speaker, const char* text) {
@@ -127,7 +127,7 @@ void parse_title(struct lexer* l) {
     Section* sec = section_alloc();
     *sec = (Section) {
         .name = (AUX_StringView){ l->buf + tok.idx, tok.len },
-        .first = &dialogo.arvore[dialogo.count],
+        .first = &loja.arvore[loja.count],
     };
 
     while (tok.kind != FECHA_LINHA) {
@@ -326,26 +326,26 @@ void parse_dialogue(struct lexer* l) {
 }
 
 
-void dialogo_setup(SDL_Renderer* ren) {
+void loja_setup(SDL_Renderer* ren) {
     UNUSED(ren);
 
     TTF_Init();
 
-    dialogo.font = TTF_OpenFont(ASSETS"básica-unicode-regular.ttf", TAM_FONTE);
-    if (!dialogo.init) {
-        dialogo.current = &dialogo.arvore[0];
-        dialogo.choosing = false;
-        dialogo.opt_idx = 0;
-        dialogo.count = 0;
+    loja.font = TTF_OpenFont(ASSETS"básica-unicode-regular.ttf", TAM_FONTE);
+    if (!loja.init) {
+        loja.current = &loja.arvore[0];
+        loja.choosing = false;
+        loja.opt_idx = 0;
+        loja.count = 0;
 
-        lexer_init(&dialogo.lexer, ASSETS"diálogo.mvp.md");
-        parse_dialogue(&dialogo.lexer);
+        lexer_init(&loja.lexer, ASSETS"diálogo.mvp.md");
+        parse_dialogue(&loja.lexer);
     }
-    dialogo.init = true;
+    loja.init = true;
 }
 
-void dialogo_render(SDL_Renderer* ren, TTF_Font* font) {
-    DialogueNode* node = dialogo.current;
+void loja_render(SDL_Renderer* ren, TTF_Font* font) {
+    DialogueNode* node = loja.current;
 
     int font_w, font_h;
     TTF_SizeUTF8(font, "O", &font_w, &font_h);
@@ -364,10 +364,10 @@ void dialogo_render(SDL_Renderer* ren, TTF_Font* font) {
     AUX_DrawTextTTFWrap(ren, font, node->text,    text.x + wpad/2, text.y + hpad,
                         text.w - wpad);
 
-    if (dialogo.choosing && !node->action) {
+    if (loja.choosing && !node->action) {
         char buf[300];
         for (size_t i = 0; i < node->num_opts; ++i) {
-            const char prefix = i==dialogo.opt_idx ? '>' : ' ';
+            const char prefix = i==loja.opt_idx ? '>' : ' ';
             const DialogueOption opt = node->opts[i];
 
             sprintf(buf, "%c %s", prefix, opt.text);
@@ -381,15 +381,15 @@ void dialogo_render(SDL_Renderer* ren, TTF_Font* font) {
     }
 }
 
-enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
-    DialogueNode* node = dialogo.current;
+enum tela loja_loop(SDL_Renderer* ren, SDL_Event evt) {
+    DialogueNode* node = loja.current;
     if (!node->speaker && !node->text) {
         assert(node->num_opts == 1);
         assert(node->opts[0].text == NULL);
 
-        DialogueOption* opt = &node->opts[dialogo.opt_idx];
+        DialogueOption* opt = &node->opts[loja.opt_idx];
         if (!opt->next) opt->next = section_find(opt->sect)->first;
-        dialogo.current = node = opt->next;
+        loja.current = node = opt->next;
     }
 
     switch (evt.type) {
@@ -397,62 +397,62 @@ enum tela dialogo_loop(SDL_Renderer* ren, SDL_Event evt) {
           case SDLK_ESCAPE: return MENU;
 
           case SDLK_SPACE: case SDLK_RETURN: {
-              assert(node->num_opts == 0 || dialogo.opt_idx < node->num_opts);
+              assert(node->num_opts == 0 || loja.opt_idx < node->num_opts);
 
               if (node->num_opts > 0) {
-                  DialogueOption* opt = &node->opts[dialogo.opt_idx];
+                  DialogueOption* opt = &node->opts[loja.opt_idx];
                   if (!opt->next) opt->next = section_find(opt->sect)->first;
 
-                  if (!dialogo.choosing) {
-                      dialogo.choosing = true;
+                  if (!loja.choosing) {
+                      loja.choosing = true;
                       if (node->action) {
                           pocoes_possiveis[0] = 0;
                           for (size_t i = 0; i < node->num_opts; i++)
                               pocoes_possiveis_add(node->opts[i].text);
                           return MESA;
                       }
-                  } else if (!node->action) dialogo.current = opt->next;
+                  } else if (!node->action) loja.current = opt->next;
               } else if (node->next) {
-                  dialogo.current = node->next;
-                  dialogo.choosing = false;
+                  loja.current = node->next;
+                  loja.choosing = false;
               }
 
-              dialogo.opt_idx = 0;
+              loja.opt_idx = 0;
           } break;
 
           //! puxar lógica do menu
           case SDLK_UP: if (node->num_opts > 0 && !node->action) {
-              dialogo.opt_idx = (dialogo.opt_idx - 1 + node->num_opts) % node->num_opts;
+              loja.opt_idx = (loja.opt_idx - 1 + node->num_opts) % node->num_opts;
           } break;
           case SDLK_DOWN: if (node->num_opts > 0 && !node->action) {
-              dialogo.opt_idx = (dialogo.opt_idx + 1) % node->num_opts;
+              loja.opt_idx = (loja.opt_idx + 1) % node->num_opts;
           } break;
       } break;
 
       case SDL_USEREVENT: switch (evt.user.code) {
           case AUX_MERGEEVENT: {
               assert(node->action);
-              dialogo.opt_idx = pocoes_possiveis_find((enum tipo_carta)evt.user.data1);
+              loja.opt_idx = pocoes_possiveis_find((enum tipo_carta)evt.user.data1);
 
-              DialogueOption* opt = &node->opts[dialogo.opt_idx];
+              DialogueOption* opt = &node->opts[loja.opt_idx];
               if (!opt->next) opt->next = section_find(opt->sect)->first;
-              dialogo.current = opt->next;
-              dialogo.choosing = false;
+              loja.current = opt->next;
+              loja.choosing = false;
           } break;
           case AUX_TIMEOUTEVENT: {
               AUX_RenderClearColor(ren, PRETO); //! colocar fundo
-              dialogo_render(ren, dialogo.font);
+              loja_render(ren, loja.font);
               SDL_RenderPresent(ren);
           } break;
       } break;
     }
 
-    return DIALOGO;
+    return LOJA;
 }
 
-void dialogo_free() {
-    dialogo.count = 0;
+void loja_free() {
+    loja.count = 0;
 
-    TTF_CloseFont(dialogo.font);
+    TTF_CloseFont(loja.font);
     TTF_Quit();
 }
