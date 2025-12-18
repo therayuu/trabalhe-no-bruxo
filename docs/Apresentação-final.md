@@ -139,17 +139,15 @@ int main() { /* ... */
     uint32_t falta = TIMEOUT;
     for (SDL_Event evt; evt.type != SDL_QUIT; ) {
         AUX_NextEvent(&evt, &falta, TIMEOUT);
+
         enum tela prox;
         switch (tela) {
             case ZERO: prox = MENU; break;
             case MENU: prox = menu_loop(ren, evt); break;
             case MESA: prox = mesa_loop(ren, evt); break;
+            case LOJA: prox = loja_loop(ren, evt); break;
         }
-        switch (prox_diff(tela, prox)) {
-            case ZERO: break;
-            case MENU: menu_setup(ren); break;
-            case MESA: mesa_setup(ren); break;
-        }
+
         /* ... */
         tela = prox;
     }
@@ -161,84 +159,50 @@ int main() { /* ... */
 
 \small
 ```c
-int main() { /* ... */
-    enum tela tela = ZERO;
-    uint32_t falta = TIMEOUT;
-    for (SDL_Event evt; evt.type != SDL_QUIT; ) {
-        AUX_NextEvent(&evt, &falta, TIMEOUT);
-        /* ... */
-        switch (curr_diff(tela, prox)) {
-            case ZERO: break;
-            case MENU: menu_free(); break;
-            case MESA: mesa_free(); break;
-        }
-        switch (trans(tela, prox)) {
-            case trans(MENU, ZERO): evt.type = SDL_QUIT; break;
-        }
-        /* ... */
+bool AUX_WaitEventTimeoutCount(SDL_Event* evt, uint32_t* ms) {
+    static uint32_t antes;
+    if (antes == 0) antes = SDL_GetTicks();
+
+    bool evento = SDL_WaitEventTimeout(evt, *ms);
+    if (evento) {
+        uint32_t delta = DT(antes, &antes);
+        *ms = (delta < *ms) ? *ms - delta : 0;
     }
-    /* ... */
+    return evento;
+}
+
+bool AUX_WaitEventTimeout(SDL_Event* evt, uint32_t* ms,
+                                          uint32_t timeout) {
+    bool evento = AUX_WaitEventTimeoutCount(evt, ms);
+    if (!evento) *ms = timeout;
+
+    return evento;
 }
 ```
 
-## Menu
-
-Cada botão no menu é um retângulo com um texto e algum tipo de saída.
-
-```c
-typedef struct {
-    SDL_Rect box;
-    char* label;
-    union {
-        intptr_t id, out;
-        void* ptr;
-    };
-} AUX_Button;
-```
-
-Os botões são guardados numa lista e podem ser selecionados pelo mouse ou pelas setas do teclado.
-A seleção, no código, é feita com um cursor que é um índice dessa lista.
-
-## Menu
+## Geral
 
 \small
 ```c
-void AUX_DrawButton(SDL_Renderer* ren, AUX_Button bot,
-                                       SDL_Color fundo,
-                                       SDL_Color frente) {
-    const SDL_Rect box = bot.box;
-    const char* label = bot.label;
-    const int tam = box.h*2/6;
+typedef enum {
+    AUX_TIMEOUTEVENT = 0,
+    AUX_SURECLICKEVENT,
+    AUX_FIRSTUSEREVENT,
+} AUX_EventType;
 
-    AUX_SetRenderDrawColor(ren, fundo);
-    SDL_RenderFillRect(ren, &box);
-    AUX_SetRenderDrawColor(ren, frente);
-
-    SDL_Rect text_box = AUX_MeasureTextRects(label, tam);
-                        AUX_CenterRect(&text_box, box);
-    AUX_DrawTextRects(ren, label, tam, text_box.x, text_box.y);
+void AUX_FillTimeout(SDL_Event* evt) {
+     evt->user = (SDL_UserEvent) {
+         .type = SDL_USEREVENT,
+         .code = AUX_TIMEOUTEVENT,
+         .timestamp = SDL_GetTicks(),
+     };
 }
-```
 
-## Mesa (Cartas)
-
-```c
-enum tipo_carta {
-    CARTA_NADA = 0,
-
-    CARTA_FOGO,
-    CARTA_AGUA,
-    CARTA_TERRA,
-    CARTA_AR,
-
-    NUM_TIPOS_CARTA,
-};
-
-struct carta {
-    DragDropRect drag;
-    enum tipo_carta tipo;
-    uint16_t cliques;
-};
+void AUX_NextEvent(SDL_Event* evt, uint32_t* falta,
+                                   uint32_t timeout) {
+    if (AUX_WaitEventTimeout(evt, falta, timeout));
+    else AUX_FillTimeout(evt);
+}
 ```
 
 ## Drag&Drop
@@ -302,7 +266,171 @@ void AUX_DragDropCancel(DragDropRect* self, SDL_Event evt) {
 }
 ```
 
-## Mesa (Cartas)
+## Drag&Drop
 
 ![Drag&Drop](img/máquina-drag&drop-avanços-2.png)
 
+## Geral
+
+\small
+```c
+#define trans(prev, curr) \
+        (((uint16_t)prev<<8) | ((uint16_t)curr))
+
+#define prox_diff(prev, curr) \
+        (((prev) != (curr)) ? curr : ZERO)
+#define curr_diff(prev, curr) \
+        (((prev) != (curr)) ? prev : ZERO)
+
+#define maior(prev, curr) (prev>curr ? prev : curr)
+#define menor(prev, curr) (prev<curr ? prev : curr)
+#define par(prev, curr) \
+        trans(menor(prev, curr), maior(prev, curr))
+```
+
+## Geral
+
+\small
+```c
+enum tipo_carta combinar(const enum tipo_carta t1,
+                         const enum tipo_carta t2) {
+    switch (par(t1, t2)) {
+        case par(CARTA_FOGO,  CARTA_AGUA): return CARTA_VAPOR;
+        case par(CARTA_TERRA, CARTA_AGUA): return CARTA_LAMA;
+        case par(CARTA_FOGO,  CARTA_AR):   return CARTA_SOM;
+
+        case par(CARTA_LAMA,  CARTA_NADA): return POCAO_LAMA;
+        case par(CARTA_SOM,   CARTA_NADA): return POCAO_SOM;
+
+        default: return CARTA_NADA;
+    }
+}
+```
+
+## Mais eventos de usuário
+
+\small
+```c
+void FillMergeEvent(SDL_Event* evt, struct carta* carta) {
+     evt->user = (SDL_UserEvent) {
+         .type = SDL_USEREVENT,
+         .code = AUX_MERGEEVENT,
+         .data1 = (void*)carta->tipo,
+         .timestamp = SDL_GetTicks(),
+     };
+}
+
+void EmitMergeEvent(struct carta* carta) {
+    SDL_Event evt; FillMergeEvent(&evt, carta);
+    SDL_PushEvent(&evt);
+}
+```
+
+## Mesclagem de cartas
+
+\small
+```c
+for (size_t i = num_cartas; i--; ) {
+    AUX_DragDropCancel(&cartas[i].drag, evt);
+    if (cartas[i].drag.state != UNCLICKED) {
+        AUX_ToEndLen(cartas, num_cartas, i); break;
+    }
+}
+```
+
+## Mesclagem de cartas
+
+\small
+```c
+struct carta* last = &cartas[num_cartas-1];
+if (last->drag.state == UNCLICKED &&
+    SDL_HasIntersection(&last->drag.r, &zona_fusao)) {
+    for (size_t i = num_cartas-1; i--;) {
+        const struct carta* curr = &cartas[i];
+        if (!SDL_HasIntersection(&last->drag.r, &curr->drag.r)||
+            !SDL_HasIntersection(&curr->drag.r, &zona_fusao))
+            continue;
+
+        struct carta n = fundir(*last, *curr);
+        if (n.tipo == CARTA_NADA) continue;
+
+        *last = n; AUX_RemoveUnordered(cartas, num_cartas, i);
+        if (AUX_NullTerminatedFind(pocoes_possiveis, &n.tipo)) {
+            EmitMergeEvent(&n); prox_tela = DIALOGO;
+        }
+        break;
+    }
+}
+```
+
+## etc
+
+\small
+```c
+static inline
+#define AUX_ToEnd(arr, i) \
+        AUX_ToEndLen(arr, LEN(arr), i)
+#define AUX_ToEndLen(arr, len, i) \
+        AUX_ToEndSzLen(arr, sizeof(*arr), len, i)
+void AUX_ToEndSzLen(void* arr, size_t size, size_t len, size_t idx) {
+  #define elem(arr, size, idx) ((arr) + (size)*(idx))
+    char *const base = arr;
+    char *const curr = elem(base, size, idx);
+
+    char buf[size];
+    memcpy(buf, curr, size);
+
+    char *const next = elem(base, size, idx+1);
+    char *const last = elem(base, size, len-1);
+
+    memmove(curr, next, last-curr);
+    memcpy(last, buf, size);
+  #undef elem
+}
+
+#define AUX_RemoveUnordered(arr, len, i) do { \
+    AUX_ToEndLen(arr, len, i); len -= 1; \
+} while(0)
+```
+
+## etc
+
+\small
+```c
+static inline
+#define AUX_Find(arr, needle) \
+        AUX_FindLen(arr, LEN(arr), needle)
+#define AUX_FindLen(arr, len, needle) \
+        AUX_FindSzLen(arr, sizeof(*arr), len, needle)
+void* AUX_FindSzLen(void* arr, size_t size, size_t len, void* needle) {
+  #define elem(arr, size, idx) ((arr) + (size)*(idx))
+    char *const base = arr;
+    for (size_t i = 0; i < len; i++) {
+        char *const curr = elem(base, size, i);
+        if (memcmp(curr, needle, size) == 0) return curr;
+    } return NULL;
+  #undef elem
+}
+```
+
+## etc
+
+\small
+```c
+static inline
+#define AUX_NullTerminatedLen(arr) \
+        AUX_NullTerminatedLenSz(arr, sizeof(*arr))
+size_t AUX_NullTerminatedLenSz(void* arr, size_t size) {
+  #define elem(arr, size, idx) ((arr) + (size)*(idx))
+    char zero[size]; memset(zero, 0, size);
+    char *const base = arr;
+    for (size_t i = 0;; i++) {
+        char *const curr = elem(base, size, i);
+        if (memcmp(curr, zero, size) == 0) return i;
+    }
+  #undef elem
+}
+
+#define AUX_NullTerminatedFind(arr, needle) \
+        AUX_FindLen(arr, AUX_NullTerminatedLen(arr), needle)
+```
