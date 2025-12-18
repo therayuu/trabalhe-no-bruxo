@@ -201,13 +201,26 @@ void AUX_RenderClearColor(SDL_Renderer* renderer, SDL_Color cor) {
     SDL_RenderClear(renderer);
 }
 
-void AUX_RenderBackgroundImage(SDL_Renderer* renderer, SDL_Texture* img) {
-    //! cortar em vez de amassar a imagem
-    // SDL_Rect janela = {0};
-    // SDL_GetRendererOutputSize(renderer, &janela.w, &janela.h);
-    // //! contas aqui
-    // SDL_RenderCopy(renderer, img, NULL, &janela);
-    SDL_RenderCopy(renderer, img, NULL, NULL);
+//! fazer versões que acompanham especificamente a altura / largura / esticam
+void AUX_RenderBackgroundImage(SDL_Renderer* renderer, SDL_Texture* img) { //! AUX_Texture?
+    SDL_Rect src = {0}, dst = {0};
+
+    SDL_QueryTexture(img, NULL, NULL, &src.w, &src.h);
+    SDL_GetRendererOutputSize(renderer, &dst.w, &dst.h);
+
+    double scale_w = (double)dst.w / src.w;
+    double scale_h = (double)dst.h / src.h;
+    double scale = (scale_w > scale_h) ? scale_w : scale_h; // cover
+
+    int out_w = (int)round(dst.w / scale);
+    int out_h = (int)round(dst.h / scale);
+    SDL_Rect out = {
+        .x = (src.w - out_w)/2,
+        .y = (src.h - out_h)/2,
+        .w = out_w, .h = out_h,
+    };
+
+    SDL_RenderCopy(renderer, img, &out, NULL);
 }
 
 void AUX_TextureInit(SDL_Renderer* ren, AUX_Texture* tex) {
