@@ -1,7 +1,7 @@
 defaults = ./config/defaults.yaml
 header   = ./config/header.tex
 
-all: Apresentação.pdf Estado-final.pdf Avanços
+all: Apresentação.pdf Apresentação-final.pdf Avanços
 
 Avanços: Avanços-2.pdf \
          Avanços-3.pdf \
